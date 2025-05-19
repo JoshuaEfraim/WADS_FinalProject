@@ -126,3 +126,8 @@ export async function updateTicket(req,res){
 export async function deleteTicket(req,res){
     res.send("admin delete ticket")
 }
+
+export async function deleteUsers(req,res) {
+    
+    
+}
