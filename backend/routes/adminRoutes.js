@@ -1,5 +1,5 @@
 import express from 'express';
-import { deleteTicket, getAdminTickets, getAllUsers, getRecentTicket, getTicketByPriority, getTicketByStatus, getTicketReport, updateTicket } from '../controllers/adminControllers.js';
+import { approveTicket, deleteTicket, getAdminDashboardData, getAdminTickets, getAllUsers,  getTicketByPriority, getTicketByStatus, updateTicket } from '../controllers/adminControllers.js';
 
 const router = express.Router();
 
@@ -7,15 +7,15 @@ router.get("/users", getAllUsers)
 
 router.get("/tickets", getAdminTickets)
 
+router.get("/dashboard", getAdminDashboardData)
+
 router.get("/ticket/status/:status", getTicketByStatus)
 
 router.get("/ticket/priority/:priority", getTicketByPriority)
 
-router.get("/tikcet/report", getTicketReport)
+router.post("/approveTicket/:ticketId", approveTicket)
 
-router.get("/ticket/recent", getRecentTicket)
-
-router.put("/ticket/:id", updateTicket)
+router.patch("/ticket/:ticketId" , updateTicket);
 
 router.delete("/ticket/:id", deleteTicket)
 
