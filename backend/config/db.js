@@ -1,8 +1,3 @@
-// import { PrismaClient } from '@prisma/client';
-
-// const prisma = new PrismaClient();
-
-// export default prisma;
 import mongoose from 'mongoose';
 
 export const connectDB = async () => {
