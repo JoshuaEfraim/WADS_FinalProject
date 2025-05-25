@@ -155,8 +155,6 @@ export async function getAllUsers(req, res) {
   }
 }
 
-
-
 export async function getAdminTickets(req, res) {
   try {
     const { page, limit, search, sort, status, priority } = req.query;
@@ -255,7 +253,7 @@ export async function getTicketByPriority(req, res) {
 
 export async function updateTicket(req, res) {
   try {
-    const user = await User.findOne({role: "ADMIN"});
+    const user = await User.findOne({ role: "ADMIN" });
     const ticket = await Ticket.findById(req.params.ticketId);
     if (!ticket) return res.status(404).json({ message: 'Ticket not found' });
 
@@ -264,51 +262,60 @@ export async function updateTicket(req, res) {
       return res.status(403).json({ message: 'Access denied' });
     }
 
-    // Prevent non-admin users from updating certain ticket statuses
-    if (user.role !== 'ADMIN') {
-      // Disallow updates to status
+    const prevStatus = ticket.status;
+
+    // Non-admin user restrictions
+    if (user.role.toUpperCase() !== 'ADMIN') {
       if ('status' in req.body) {
         return res.status(403).json({ message: 'You are not allowed to update ticket status' });
       }
 
-      // Disallow updates if ticket is not approved
       if (['AWAITING_APPROVAL', 'REJECTED'].includes(ticket.status)) {
         return res.status(403).json({ message: 'Cannot update unapproved ticket' });
       }
 
-      // Allow other updates (excluding status)
       ticket.set(req.body);
     } else {
       // Admin can update everything
-      const prevStatus = ticket.status;
+      const newStatus = req.body.status?.toUpperCase();
+
+      //  Prevent changing status back to AWAITING_APPROVAL after it's approved
+      if (prevStatus !== 'AWAITING_APPROVAL' && newStatus === 'AWAITING_APPROVAL') {
+        return res.status(403).json({ message: 'Cannot revert status to AWAITING_APPROVAL after approval' });
+      }
 
       ticket.set({
         ...req.body,
-        ...(req.body.status && { status: req.body.status.toUpperCase() }),
+        ...(newStatus && { status: newStatus }),
         ...(req.body.priority && { priority: req.body.priority.toUpperCase() })
       });
 
-      // If admin changed status from AWAITING_APPROVAL to PENDING
-      if (
-        prevStatus === 'AWAITING_APPROVAL' &&
-        req.body.status &&
-        req.body.status.toUpperCase() === 'PENDING'
-      ) {
+      // Log approval and notify user
+      if (prevStatus === 'AWAITING_APPROVAL' && newStatus === 'PENDING') {
         await approvedTicket.create({
           ticketId: ticket._id,
           adminId: user._id
         });
+
+        //  approval notification
+      }
+
+      // Notify user on any other status change
+      if (newStatus && prevStatus !== newStatus) {
+        // status change notification
       }
     }
 
     await ticket.save();
-    const updated = await Ticket.findById(ticket._id).populate('userId', 'userId name email');
+    const updated = await Ticket.findById(ticket._id).populate('userId', 'name email');
 
     res.json(updated);
   } catch (error) {
     res.status(500).json({ message: 'Error updating ticket', error: error.message });
   }
 }
+
+
 
 
 export async function deleteTicket(req, res) {
