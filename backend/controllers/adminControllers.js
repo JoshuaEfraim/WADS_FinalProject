@@ -1,5 +1,3 @@
-// import prisma from "../config/db.js";
-// import { connectDB } from "../config/db.js"
 import User from '../models/User.js'
 import Ticket from '../models/Ticket.js'
 import mongoose from "mongoose";
@@ -7,15 +5,115 @@ import TicketReply from '../models/ticketReply.js'
 import approvedTicket from '../models/ApprovedTicket.js'
 import notification from '../models/notification.js'
 
-export async function getAdminDashboardData(req,res) {
-    try {
-        
+// ADMIN CONTROLLER
 
+export async function getAdminDashboardData(req, res) {
+  try {
+    // Total counts
+    const totalUsers = await User.countDocuments();
+    const totalTickets = await Ticket.countDocuments();
+    const totalResolvedTickets = await Ticket.countDocuments({ status: "RESOLVED" });
 
-    } catch (error) {
-        
-    }
+    // Ticket priority summary
+    const prioritySummary = await Ticket.aggregate([
+      {
+        $group: {
+          _id: "$priority",
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    // Ticket status summary
+    const statusSummary = await Ticket.aggregate([
+      {
+        $group: {
+          _id: "$status",
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    // Recent tickets (latest 5)
+    const recentTickets = await Ticket.find()
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .populate("userId", "name email");
+
+    // Daily Chart (last 24 hours, grouped in 4-hour intervals)
+    const now = new Date();
+    const past24Hours = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+    const dailyChart = await Ticket.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: past24Hours }
+        }
+      },
+      {
+        $project: {
+          interval: {
+            $concat: [
+              { $substr: [{ $hour: "$createdAt" }, 0, 2] },
+              "-",
+              {
+                $substr: [
+                  { $add: [{ $subtract: [{ $hour: "$createdAt" }, { $mod: [{ $hour: "$createdAt" }, 4] }] }, 4] },
+                  0,
+                  2
+                ]
+              }
+            ]
+          },
+          status: 1
+        }
+      },
+      {
+        $group: {
+          _id: { interval: "$interval", status: "$status" },
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    // Weekly Chart (last 7 days grouped by day and status)
+    const past7Days = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const weeklyChart = await Ticket.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: past7Days }
+        }
+      },
+      {
+        $project: {
+          day: { $dayOfWeek: "$createdAt" }, // 1 (Sunday) - 7 (Saturday)
+          status: 1
+        }
+      },
+      {
+        $group: {
+          _id: { day: "$day", status: "$status" },
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    return res.status(200).json({
+      totalUsers,
+      totalTickets,
+      totalResolvedTickets,
+      prioritySummary,
+      statusSummary,
+      recentTickets,
+      dailyChart,
+      weeklyChart
+    });
+  } catch (error) {
+    console.error("Dashboard Data Error:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
 }
+
 
 export async function getAllUsers(req, res) {
   try {
@@ -112,41 +210,26 @@ export async function getAdminTickets(req, res) {
   }
 }
 
-export async function approveTicket(req, res) {
+export async function getTicketDetails(req, res) {
   try {
-
     const user = await User.findById(req.user.id);
-    if (user.role !== 'ADMIN') {
-      return res.status(403).json({ message: 'Only admin can approve tickets.' });
-    }
 
-    const ticket = await Ticket.findById(req.params.ticketId);
+    const ticket = await Ticket.findById(req.params.id).populate('userId', 'name email role');
     if (!ticket) return res.status(404).json({ message: 'Ticket not found' });
 
-    if (ticket.status !== 'AWAITING_APPROVAL') {
-      return res.status(400).json({ message: 'Ticket must be in PENDING_APPROVAL status' });
+    if (user.role !== 'ADMIN' && ticket.userId._id.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'Access denied' });
     }
 
-    ticket.status = 'PENDING';
-    await ticket.save();
-
-    await approvedTicket.create({ ticketId: ticket._id, userId: user._id });
-
-    const updatedTicket = await Ticket.findById(ticket._id).populate('userId', 'userId name email');
-
-    res.json({ message: 'Ticket approved successfully', ticket: updatedTicket });
-
+    res.json(ticket);
   } catch (error) {
-    res.status(500).json({ message: 'Error approving ticket', error: error.message });
+    res.status(500).json({ message: 'Error fetching ticket', error: error.message });
   }
 }
-
 
 export async function getTicketByStatus(req, res) {
   try {
     const status = req.params.status.toUpperCase();
-
-    // await connectDB();
 
     const tickets = await Ticket.find({ status })
       .sort({ createdAt: -1 }); // descending order
@@ -161,8 +244,6 @@ export async function getTicketByPriority(req, res) {
   try {
     const priority = req.params.priority.toUpperCase();
 
-    // await connectDB();
-
     const tickets = await Ticket.find({ priority })
       .sort({ createdAt: -1 }); // descending order
 
@@ -174,25 +255,51 @@ export async function getTicketByPriority(req, res) {
 
 export async function updateTicket(req, res) {
   try {
-
-    const user = await User.findById(req.user.id);
+    const user = await User.findOne({role: "ADMIN"});
     const ticket = await Ticket.findById(req.params.ticketId);
     if (!ticket) return res.status(404).json({ message: 'Ticket not found' });
 
+    // Access control
     if (user.role !== 'ADMIN' && ticket.userId.toString() !== req.user.id) {
       return res.status(403).json({ message: 'Access denied' });
     }
 
-    if (user.role !== 'ADMIN' &&
-        (ticket.status === 'AWAITING_APPROVAL' || ticket.status === 'REJECTED')) {
-      return res.status(403).json({ message: 'Cannot update unapproved ticket' });
-    }
+    // Prevent non-admin users from updating certain ticket statuses
+    if (user.role !== 'ADMIN') {
+      // Disallow updates to status
+      if ('status' in req.body) {
+        return res.status(403).json({ message: 'You are not allowed to update ticket status' });
+      }
 
-    ticket.set({
-      ...req.body,
-      ...(req.body.status && { status: req.body.status.toUpperCase() }),
-      ...(req.body.priority && { priority: req.body.priority.toUpperCase() })
-    });
+      // Disallow updates if ticket is not approved
+      if (['AWAITING_APPROVAL', 'REJECTED'].includes(ticket.status)) {
+        return res.status(403).json({ message: 'Cannot update unapproved ticket' });
+      }
+
+      // Allow other updates (excluding status)
+      ticket.set(req.body);
+    } else {
+      // Admin can update everything
+      const prevStatus = ticket.status;
+
+      ticket.set({
+        ...req.body,
+        ...(req.body.status && { status: req.body.status.toUpperCase() }),
+        ...(req.body.priority && { priority: req.body.priority.toUpperCase() })
+      });
+
+      // If admin changed status from AWAITING_APPROVAL to PENDING
+      if (
+        prevStatus === 'AWAITING_APPROVAL' &&
+        req.body.status &&
+        req.body.status.toUpperCase() === 'PENDING'
+      ) {
+        await approvedTicket.create({
+          ticketId: ticket._id,
+          adminId: user._id
+        });
+      }
+    }
 
     await ticket.save();
     const updated = await Ticket.findById(ticket._id).populate('userId', 'userId name email');
@@ -204,13 +311,62 @@ export async function updateTicket(req, res) {
 }
 
 
+export async function deleteTicket(req, res) {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
 
+    const ticket = await Ticket.findById(req.params.ticketId);
+    if (!ticket) {
+      return res.status(404).json({ message: 'Ticket not found' });
+    }
 
-export async function deleteTicket(req,res){
-    res.send("admin delete ticket")
+    // Check if user is admin or owns the ticket
+    if (user.role !== 'admin' && ticket.user.toString() !== user._id.toString()) {
+      return res.status(403).json({ message: 'You are not authorized to delete this ticket' });
+    }
+
+    await ticket.deleteOne();
+
+    res.status(200).json({ message: 'Ticket deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
 }
 
-export async function deleteUsers(req,res) {
-    
-    
+export async function deleteUsers(req, res) {
+  try {
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Only admins can delete users
+    if (user.role !== 'admin') {
+      return res.status(403).json({ message: 'You are not authorized to delete users' });
+    }
+
+    // The ID of the user to delete is in req.params.id
+    const userToDelete = await User.findById(req.params.id);
+
+    if (!userToDelete) {
+      return res.status(404).json({ message: 'User to delete not found' });
+    }
+
+    // Optionally, prevent admin from deleting themselves
+    if (userToDelete._id.toString() === user._id.toString()) {
+      return res.status(400).json({ message: 'Admin cannot delete themselves' });
+    }
+
+    await userToDelete.deleteOne();
+
+    res.status(200).json({ message: 'User deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
 }

@@ -3,11 +3,12 @@ import mongoose from 'mongoose';
 
 const approvedTicketSchema = new mongoose.Schema({
   ticketId: { type: mongoose.Types.ObjectId, ref: 'Ticket', required: true },
-  userId: { type: mongoose.Types.ObjectId, ref: 'User', required: true }
+  adminId: { type: mongoose.Types.ObjectId, ref: 'User', required: true }
+
 }, { timestamps: true });
 
 // Composite unique index
-approvedTicketSchema.index({ ticketId: 1, userId: 1 }, { unique: true });
+approvedTicketSchema.index({ ticketId: 1, adminId: 1 }, { unique: true });
 
 const approvedTicket = mongoose.model("approvedTicket", approvedTicketSchema)
 
