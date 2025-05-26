@@ -1,10 +1,10 @@
 // import prisma from "../config/db.js";
 // import { connectDB } from "../config/db.js"
-import User from '../models/User.js'
-import Ticket from '../models/Ticket.js'
+import User from '../models/user.js'
+import Ticket from '../models/ticket.js'
 import mongoose from "mongoose";
 import TicketReply from '../models/ticketReply.js'
-import approvedTicket from '../models/ApprovedTicket.js'
+import approvedTicket from '../models/approvedTicket.js'
 import notification from '../models/notification.js'
 
 export async function getAdminDashboardData(req,res) {
