@@ -26,17 +26,13 @@ const ticketReplySchema = new mongoose.Schema({
     ref: 'User', // same for admin and user
     required: true,
   },
-  senderRole: {
-    type: String,
-    enum: ['admin', 'user'],
-    required: true,
-  },
   message: {
     type: String,
     required: true,
   }
 }, { timestamps: true });
 
-const TicketReply = mongoose.models.TicketReply || mongoose.model('TicketReply', ticketReplySchema);
+const TicketReply = mongoose.model('TicketReply', ticketReplySchema);
+
 export default TicketReply;
 
