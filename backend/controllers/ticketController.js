@@ -7,10 +7,10 @@ import TicketReply from '../models/ticketReply.js';
  */
 export const replyToTicket = async (req, res) => {
   try {
-    const { replyMessage, senderId, senderRole } = req.body;
+    const { senderId, replyMessage } = req.body;
 
-    if (!['admin', 'user'].includes(senderRole)) {
-      return res.status(400).json({ message: 'senderRole must be "admin" or "user"' });
+    if (!senderId || !replyMessage) {
+      return res.status(400).json({ message: 'Missing required fields' });
     }
 
     const ticket = await Ticket.findById(req.params.id);
@@ -21,7 +21,6 @@ export const replyToTicket = async (req, res) => {
     const reply = new TicketReply({
       ticketId: ticket._id,
       senderId,
-      senderRole,
       message: replyMessage,
     });
 
@@ -32,18 +31,7 @@ export const replyToTicket = async (req, res) => {
   }
 };
 
-export const getAllResolvedTickets = async (req, res) => {
-  try {
-    const tickets = await Ticket
-      .find({ status: 'RESOLVED' })
-      .populate('userId', 'name email')
-      .sort({ updatedAt: -1 });
 
-    res.json({ tickets });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
 
 export const getTicketReply = async (req, res) => {
   try {
@@ -79,3 +67,45 @@ export const getUserTicketHistory = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+export const getAllResolvedTickets = async (req, res) => {
+  try {
+    const tickets = await Ticket
+      .find({ status: 'RESOLVED' })
+      .populate('userId', 'name email')
+      .sort({ updatedAt: -1 });
+
+    res.json({ tickets });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// import Ticket from '../models/ticket.js';
+// import TicketReply from '../models/ticketReply.js';
+// import User from '../models/user.js'; // TEMP: used for role lookup
+
+// // POST /api/tickets/:id/reply
+// export const replyToTicket = async (req, res) => {
+//   try {
+//     const { replyMessage, senderId } = req.body; // ✅ Extract first
+//     console.log("Looking for user with ID:", senderId); // ✅ Then log
+
+//     const ticket = await Ticket.findById(req.params.id);
+//     if (!ticket) return res.status(404).json({ message: 'Ticket not found' });
+
+//     const user = await User.findById(senderId);
+//     if (!user) return res.status(404).json({ message: 'Sender not found' });
+
+//     const reply = new TicketReply({
+//       ticketId: ticket._id,
+//       senderId: user._id,
+//       message: replyMessage,
+//     });
+
+//     await reply.save();
+//     res.status(201).json({ message: 'Reply added successfully', reply });
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// };

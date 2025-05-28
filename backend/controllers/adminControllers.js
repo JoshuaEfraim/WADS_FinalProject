@@ -1,4 +1,4 @@
-import User from '../models/User.js'
+import User from '../models/user.js'
 import Ticket from '../models/ticket.js'
 import mongoose from "mongoose";
 import TicketReply from '../models/ticketReply.js'
