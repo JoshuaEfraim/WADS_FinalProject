@@ -1,5 +1,5 @@
   // models/Ticket.js
-import mongoose, { mongo } from 'mongoose';
+import mongoose from 'mongoose';
 
 const ticketSchema = new mongoose.Schema({
   userId: { type: mongoose.Types.ObjectId, ref: 'User', required: true },
@@ -15,7 +15,7 @@ const ticketSchema = new mongoose.Schema({
 
 ticketSchema.index({ createdAt: 1 });
 
-const Ticket = mongoose.model("Ticket", ticketSchema)
+const Ticket =  mongoose.models.Ticket || mongoose.model("Ticket", ticketSchema)
 
 
 export default Ticket;

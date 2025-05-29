@@ -4,6 +4,7 @@ import AdminDashboard from './pages/Admin/AdminDashboard'
 import ManageTickets from './pages/Admin/ManageTickets'
 import ManageUsers from './pages/Admin/ManageUsers'
 import Settings from './pages/Admin/Settings'
+import TicketDetails from './pages/Admin/TicketDetails'
 import AdminLayout from './components/AdminLayout'
 
 const App = () => {
@@ -15,9 +16,11 @@ const App = () => {
 
           {/* {Admin Routes} */}
           {/* <Route element ={<PrivateRoute allowedRoles={["admin"]}/>}> */}
+            {/* <Route path='/' element ={<AdminDashboard/>}/> */}
             <Route path='/admin' element ={<AdminDashboard/>}/>
             <Route path='/admin/dashboard' element= {<AdminDashboard/>}/>
             <Route path='/admin/tickets' element= {<ManageTickets/>}/>
+            <Route path='/admin/tickets/:id' element={<TicketDetails/>}/>
             <Route path='/admin/users' element= {<ManageUsers/>}/>
             <Route path='/admin/settings' element= {<Settings/>}/>
           {/* </Route> */}
