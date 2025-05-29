@@ -2,15 +2,16 @@ import Ticket from '../models/ticket.js';
 import TicketReply from '../models/ticketReply.js';
 
 /**
- * POST /api/tickets/:id/reply
- * Add a reply to a ticket (from admin or user)
+ * POST /api/tickets/reply/:id
+ * Add a reply to a ticket (from authenticated admin or user)
  */
 export const replyToTicket = async (req, res) => {
   try {
-    const { senderId, replyMessage } = req.body;
+    const { replyMessage } = req.body;
+    const senderId = req.user._id; // get from authenticated user
 
-    if (!senderId || !replyMessage) {
-      return res.status(400).json({ message: 'Missing required fields' });
+    if (!replyMessage) {
+      return res.status(400).json({ message: 'Reply message is required' });
     }
 
     const ticket = await Ticket.findById(req.params.id);
@@ -31,8 +32,6 @@ export const replyToTicket = async (req, res) => {
   }
 };
 
-
-
 export const getTicketReply = async (req, res) => {
   try {
     const ticket = await Ticket
@@ -45,6 +44,7 @@ export const getTicketReply = async (req, res) => {
 
     const replies = await TicketReply
       .find({ ticketId: ticket._id })
+      .populate('senderId', 'name email role') // ⬅️ populate reply sender info
       .sort({ createdAt: 1 });
 
     res.json({ ticket, replies });
@@ -80,32 +80,3 @@ export const getAllResolvedTickets = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-
-// import Ticket from '../models/ticket.js';
-// import TicketReply from '../models/ticketReply.js';
-// import User from '../models/user.js'; // TEMP: used for role lookup
-
-// // POST /api/tickets/:id/reply
-// export const replyToTicket = async (req, res) => {
-//   try {
-//     const { replyMessage, senderId } = req.body; // ✅ Extract first
-//     console.log("Looking for user with ID:", senderId); // ✅ Then log
-
-//     const ticket = await Ticket.findById(req.params.id);
-//     if (!ticket) return res.status(404).json({ message: 'Ticket not found' });
-
-//     const user = await User.findById(senderId);
-//     if (!user) return res.status(404).json({ message: 'Sender not found' });
-
-//     const reply = new TicketReply({
-//       ticketId: ticket._id,
-//       senderId: user._id,
-//       message: replyMessage,
-//     });
-
-//     await reply.save();
-//     res.status(201).json({ message: 'Reply added successfully', reply });
-//   } catch (err) {
-//     res.status(500).json({ error: err.message });
-//   }
-// };
