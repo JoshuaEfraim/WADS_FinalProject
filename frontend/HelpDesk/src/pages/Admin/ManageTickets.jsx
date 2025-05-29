@@ -34,6 +34,9 @@ const ManageTickets = () => {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   
+  // Add activeTab state
+  const [activeTab, setActiveTab] = useState("all")
+  
   // Initialize state from URL params
   const [currentPage, setCurrentPage] = useState(Number(searchParams.get('page')) || 1)
   const [showStatusDropdown, setShowStatusDropdown] = useState(false)
@@ -249,243 +252,270 @@ const ManageTickets = () => {
 
       {/* Tabs */}
       <div className="flex border-b border-gray-200">
-        <button className="px-4 py-2 text-sm font-medium text-primary-500 border-b-2 border-primary-500">
+        <button 
+          className={`px-4 py-2 text-sm font-medium ${
+            activeTab === "all" 
+              ? "text-primary-500 border-b-2 border-primary-500" 
+              : "text-gray-500 hover:text-gray-700"
+          }`}
+          onClick={() => setActiveTab("all")}
+        >
           All Tickets
         </button>
-        <button className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">Ticket History</button>
+        <button 
+          className={`px-4 py-2 text-sm font-medium ${
+            activeTab === "history" 
+              ? "text-primary-500 border-b-2 border-primary-500" 
+              : "text-gray-500 hover:text-gray-700"
+          }`}
+          onClick={() => setActiveTab("history")}
+        >
+          Ticket History
+        </button>
       </div>
 
-      {/* Tickets Table */}
-      <div className="bg-white shadow-sm border border-gray-200 rounded-2xl">
-        {/* Filter/Sort/Search Bar Row - top of table */}
-        <div className="flex flex-wrap justify-between items-center px-4 pt-4 pb-2 gap-2">
-          {/* Search Bar (left) */}
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <Input
-                type="text"
-                placeholder="Search tickets..."
-                value={searchInput}
-                onChange={handleSearchChange}
-                onKeyDown={handleSearchKeyDown}
-                className="pl-9 pr-3 py-2 text-sm rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 w-48"
-              />
-              <Button onClick={handleSearch} className="absolute left-2 top-2 p-0 h-5 w-5 bg-transparent hover:bg-transparent">
-                <Search className="w-4 h-4 text-gray-400" />
-              </Button>
-            </div>
-          </div>
-          {/* Filter/Sort Bar (right) */}
-          <div className="flex flex-wrap items-center gap-2">
-            <Button variant="outline" size="sm" className="flex items-center gap-1 text-xs" onClick={handleSortChange}>
-              <ArrowUpDown className="w-4 h-4" />
-              Sort
-            </Button>
-            <div className="relative">
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-1 text-xs min-w-[110px]"
-                onClick={() => setShowStatusDropdown((v) => !v)}
-              >
-                Status: <span className="font-semibold ml-1">{selectedStatus.replace("_", " ")}</span>
-                <ChevronDown className="w-4 h-4 ml-1" />
-              </Button>
-              {showStatusDropdown && (
-                <div className="absolute z-10 mt-1 w-40 bg-white border border-gray-200 rounded shadow-lg">
-                  {statusOptions.map((status) => (
-                    <button
-                      key={status}
-                      className={`w-full text-left px-4 py-2 text-xs hover:bg-primary-50 ${selectedStatus === status ? "bg-primary-100 font-semibold" : ""}`}
-                      onClick={() => handleStatusSelect(status)}
-                    >
-                      {status.replace("_", " ")}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-            <div className="relative">
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-1 text-xs min-w-[110px]"
-                onClick={() => setShowPriorityDropdown((v) => !v)}
-              >
-                Priority: <span className="font-semibold ml-1">{selectedPriority}</span>
-                <ChevronDown className="w-4 h-4 ml-1" />
-              </Button>
-              {showPriorityDropdown && (
-                <div className="absolute z-10 mt-1 w-40 bg-white border border-gray-200 rounded shadow-lg">
-                  {priorityOptions.map((priority) => (
-                    <button
-                      key={priority}
-                      className={`w-full text-left px-4 py-2 text-xs hover:bg-primary-50 ${selectedPriority === priority ? "bg-primary-100 font-semibold" : ""}`}
-                      onClick={() => handlePrioritySelect(priority)}
-                    >
-                      {priority}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Desktop Table */}
-        <div className="hidden md:block overflow-x-auto rounded-2xl ">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-gray-50">
-                <TableHead className="font-semibold text-gray-700 text-xs w-12 text-center">ID</TableHead>
-                <TableHead className="font-semibold text-gray-700 text-xs text-center">Requested By</TableHead>
-                <TableHead className="font-semibold text-gray-700 text-xs text-center">Short Description</TableHead>
-                <TableHead className="font-semibold text-gray-700 text-xs text-center">Priority Level</TableHead>
-                <TableHead className="font-semibold text-gray-700 text-xs text-center">Status</TableHead>
-                <TableHead className="font-semibold text-gray-700 text-xs text-center">Created Date</TableHead>
-                <TableHead className="font-semibold text-gray-700 text-xs text-center">Updated Date</TableHead>
-                <TableHead className="font-semibold text-gray-700 text-xs text-center">Action</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {tickets.map((ticket) => (
-                <TableRow key={ticket._id} className="border-gray-100 hover:bg-gray-50">
-                  <TableCell className="font-medium text-sm text-gray-900 text-center">{ticket._id}</TableCell>
-                  <TableCell className= "text-center">
-                    <div className="flex items-center justify-center gap-2">
-                      <Avatar className="w-6 h-6">
-                        <AvatarFallback className="text-xs bg-gray-200 text-gray-700">
-                          {ticket.userId && ticket.userId.name ? ticket.userId.name.charAt(0) : "?"}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span className="text-sm font-medium text-gray-900">
-                        {ticket.userId && ticket.userId.name ? ticket.userId.name : "Unknown"}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-sm text-gray-900 text-center">{ticket.subject}</TableCell>
-                  <TableCell className= "text-center">
-                    <span
-                      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${getPriorityClass(ticket.priority)}`}
-                    >
-                      {ticket.priority === "HIGH" ? "High" : ticket.priority === "MEDIUM" ? "Medium" : "Low"}
-                    </span>
-                  </TableCell>
-                  <TableCell className= "text-center">
-                    <span
-                      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${getStatusClass(ticket.status)}`}
-                    >
-                      {ticket.status === "PENDING"
-                        ? "Pending"
-                        : ticket.status === "REJECTED" ? "Rejected"
-                        : ticket.status === "PROCESSING" ? "Processing"
-                        : ticket.status === "RESOLVED"
-                          ? "Resolved" 
-                          : "Awaiting Approval"}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-sm text-gray-900 text-center">{new Date(ticket.createdAt).toLocaleDateString()}</TableCell>
-                  <TableCell className="text-sm text-gray-900 text-center">{new Date(ticket.updatedAt).toLocaleDateString()}</TableCell>
-                  <TableCell className="text-center">
-                    <Button variant="outline" size="sm" className="text-xs rounded-full" onClick={() => navigate(`/admin/tickets/${ticket._id}`)}>
-                      View Details
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-
-        {/* Mobile Card View */}
-        <div className="md:hidden space-y-4 p-4">
-          {tickets.map((ticket) => (
-            <div key={ticket._id} className="bg-gray-50 rounded-lg p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-bold text-gray-900">#{ticket._id}</span>
-                  <Avatar className="w-6 h-6">
-                    <AvatarFallback className="text-xs bg-gray-200 text-gray-700">
-                      {ticket.userId && ticket.userId.name ? ticket.userId.name.charAt(0) : "?"}
-                    </AvatarFallback>
-                  </Avatar>
-                  <span className="text-sm font-medium text-gray-900">
-                    {ticket.userId && ticket.userId.name ? ticket.userId.name : "Unknown"}
-                  </span>
-                </div>
-                <Button variant="outline" size="sm" className="text-xs rounded-full" onClick={() => navigate(`/admin/tickets/${ticket._id}`)}>
-                  View
+      {/* Content based on active tab */}
+      {activeTab === "all" ? (
+        // All Tickets View
+        <div className="bg-white shadow-sm border border-gray-200 rounded-2xl">
+          {/* Filter/Sort/Search Bar Row - top of table */}
+          <div className="flex flex-wrap justify-between items-center px-4 pt-4 pb-2 gap-2">
+            {/* Search Bar (left) */}
+            <div className="flex items-center gap-2">
+              <div className="relative">
+                <Input
+                  type="text"
+                  placeholder="Search tickets..."
+                  value={searchInput}
+                  onChange={handleSearchChange}
+                  onKeyDown={handleSearchKeyDown}
+                  className="pl-9 pr-3 py-2 text-sm rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 w-48"
+                />
+                <Button onClick={handleSearch} className="absolute left-2 top-2 p-0 h-5 w-5 bg-transparent hover:bg-transparent">
+                  <Search className="w-4 h-4 text-gray-400" />
                 </Button>
               </div>
-
-              <div>
-                <p className="text-sm font-medium text-gray-900 mb-1">{ticket.subject}</p>
-              </div>
-
-              <div className="flex flex-wrap gap-2">
-                <span
-                  className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${getPriorityClass(ticket.priority)}`}
+            </div>
+            {/* Filter/Sort Bar (right) */}
+            <div className="flex flex-wrap items-center gap-2">
+              <Button variant="outline" size="sm" className="flex items-center gap-1 text-xs" onClick={handleSortChange}>
+                <ArrowUpDown className="w-4 h-4" />
+                Sort
+              </Button>
+              <div className="relative">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-1 text-xs min-w-[110px]"
+                  onClick={() => setShowStatusDropdown((v) => !v)}
                 >
-                  {ticket.priority === "HIGH" ? "High" : ticket.priority === "MEDIUM" ? "Medium" : "Low"}
-                </span>
-                <span
-                  className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${getStatusClass(ticket.status)}`}
-                >
-                  {ticket.status === "IN_PROGRESS"
-                    ? "In-Progress"
-                    : ticket.status === "RESOLVED"
-                      ? "Resolved"
-                      : "New Ticket"}
-                </span>
+                  Status: <span className="font-semibold ml-1">{selectedStatus.replace("_", " ")}</span>
+                  <ChevronDown className="w-4 h-4 ml-1" />
+                </Button>
+                {showStatusDropdown && (
+                  <div className="absolute z-10 mt-1 w-40 bg-white border border-gray-200 rounded shadow-lg">
+                    {statusOptions.map((status) => (
+                      <button
+                        key={status}
+                        className={`w-full text-left px-4 py-2 text-xs hover:bg-primary-50 ${selectedStatus === status ? "bg-primary-100 font-semibold" : ""}`}
+                        onClick={() => handleStatusSelect(status)}
+                      >
+                        {status.replace("_", " ")}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
-
-              <div className="grid grid-cols-2 gap-2 text-xs text-gray-500">
-                <div>
-                  <span className="font-medium">Created:</span> {new Date(ticket.createdAt).toLocaleDateString()}
-                </div>
-                <div>
-                  <span className="font-medium">Updated:</span> {new Date(ticket.updatedAt).toLocaleDateString()}
-                </div>
+              <div className="relative">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-1 text-xs min-w-[110px]"
+                  onClick={() => setShowPriorityDropdown((v) => !v)}
+                >
+                  Priority: <span className="font-semibold ml-1">{selectedPriority}</span>
+                  <ChevronDown className="w-4 h-4 ml-1" />
+                </Button>
+                {showPriorityDropdown && (
+                  <div className="absolute z-10 mt-1 w-40 bg-white border border-gray-200 rounded shadow-lg">
+                    {priorityOptions.map((priority) => (
+                      <button
+                        key={priority}
+                        className={`w-full text-left px-4 py-2 text-xs hover:bg-primary-50 ${selectedPriority === priority ? "bg-primary-100 font-semibold" : ""}`}
+                        onClick={() => handlePrioritySelect(priority)}
+                      >
+                        {priority}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
-          ))}
-        </div>
+          </div>
 
-        {/* Pagination */}
-        <div className="flex items-center justify-center py-4 border-t border-gray-200">
-          <div className="flex items-center gap-1">
-            <Button
-              variant="outline"
-              size="icon"
-              className="w-8 h-8 p-0"
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <Button
-                key={page}
-                variant={currentPage === page ? "default" : "outline"}
-                size="sm"
-                className={`w-8 h-8 p-0 ${currentPage === page ? "bg-primary-500 text-white" : "text-gray-600"}`}
-                onClick={() => handlePageChange(page)}
-              >
-                {page}
-              </Button>
+          {/* Desktop Table */}
+          <div className="hidden md:block overflow-x-auto rounded-2xl ">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-gray-50">
+                  <TableHead className="font-semibold text-gray-700 text-xs w-12 text-center">ID</TableHead>
+                  <TableHead className="font-semibold text-gray-700 text-xs text-center">Requested By</TableHead>
+                  <TableHead className="font-semibold text-gray-700 text-xs text-center">Short Description</TableHead>
+                  <TableHead className="font-semibold text-gray-700 text-xs text-center">Priority Level</TableHead>
+                  <TableHead className="font-semibold text-gray-700 text-xs text-center">Status</TableHead>
+                  <TableHead className="font-semibold text-gray-700 text-xs text-center">Created Date</TableHead>
+                  <TableHead className="font-semibold text-gray-700 text-xs text-center">Updated Date</TableHead>
+                  <TableHead className="font-semibold text-gray-700 text-xs text-center">Action</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {tickets.map((ticket) => (
+                  <TableRow key={ticket._id} className="border-gray-100 hover:bg-gray-50">
+                    <TableCell className="font-medium text-sm text-gray-900 text-center">{ticket._id}</TableCell>
+                    <TableCell className= "text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <Avatar className="w-6 h-6">
+                          <AvatarFallback className="text-xs bg-gray-200 text-gray-700">
+                            {ticket.userId && ticket.userId.name ? ticket.userId.name.charAt(0) : "?"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="text-sm font-medium text-gray-900">
+                          {ticket.userId && ticket.userId.name ? ticket.userId.name : "Unknown"}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-sm text-gray-900 text-center">{ticket.subject}</TableCell>
+                    <TableCell className= "text-center">
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${getPriorityClass(ticket.priority)}`}
+                      >
+                        {ticket.priority === "HIGH" ? "High" : ticket.priority === "MEDIUM" ? "Medium" : "Low"}
+                      </span>
+                    </TableCell>
+                    <TableCell className= "text-center">
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${getStatusClass(ticket.status)}`}
+                      >
+                        {ticket.status === "PENDING"
+                          ? "Pending"
+                          : ticket.status === "REJECTED" ? "Rejected"
+                          : ticket.status === "PROCESSING" ? "Processing"
+                          : ticket.status === "RESOLVED"
+                            ? "Resolved" 
+                            : "Awaiting Approval"}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-sm text-gray-900 text-center">{new Date(ticket.createdAt).toLocaleDateString()}</TableCell>
+                    <TableCell className="text-sm text-gray-900 text-center">{new Date(ticket.updatedAt).toLocaleDateString()}</TableCell>
+                    <TableCell className="text-center">
+                      <Button variant="outline" size="sm" className="text-xs rounded-full" onClick={() => navigate(`/admin/tickets/${ticket._id}`)}>
+                        View Details
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Mobile Card View */}
+          <div className="md:hidden space-y-4 p-4">
+            {tickets.map((ticket) => (
+              <div key={ticket._id} className="bg-gray-50 rounded-lg p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-gray-900">#{ticket._id}</span>
+                    <Avatar className="w-6 h-6">
+                      <AvatarFallback className="text-xs bg-gray-200 text-gray-700">
+                        {ticket.userId && ticket.userId.name ? ticket.userId.name.charAt(0) : "?"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm font-medium text-gray-900">
+                      {ticket.userId && ticket.userId.name ? ticket.userId.name : "Unknown"}
+                    </span>
+                  </div>
+                  <Button variant="outline" size="sm" className="text-xs rounded-full" onClick={() => navigate(`/admin/tickets/${ticket._id}`)}>
+                    View
+                  </Button>
+                </div>
+
+                <div>
+                  <p className="text-sm font-medium text-gray-900 mb-1">{ticket.subject}</p>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  <span
+                    className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${getPriorityClass(ticket.priority)}`}
+                  >
+                    {ticket.priority === "HIGH" ? "High" : ticket.priority === "MEDIUM" ? "Medium" : "Low"}
+                  </span>
+                  <span
+                    className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${getStatusClass(ticket.status)}`}
+                  >
+                    {ticket.status === "IN_PROGRESS"
+                      ? "In-Progress"
+                      : ticket.status === "RESOLVED"
+                        ? "Resolved"
+                        : "New Ticket"}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-xs text-gray-500">
+                  <div>
+                    <span className="font-medium">Created:</span> {new Date(ticket.createdAt).toLocaleDateString()}
+                  </div>
+                  <div>
+                    <span className="font-medium">Updated:</span> {new Date(ticket.updatedAt).toLocaleDateString()}
+                  </div>
+                </div>
+              </div>
             ))}
-            <Button
-              variant="outline"
-              size="icon"
-              className="w-8 h-8 p-0"
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
+          </div>
+
+          {/* Pagination */}
+          <div className="flex items-center justify-center py-4 border-t border-gray-200">
+            <div className="flex items-center gap-1">
+              <Button
+                variant="outline"
+                size="icon"
+                className="w-8 h-8 p-0"
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <Button
+                  key={page}
+                  variant={currentPage === page ? "default" : "outline"}
+                  size="sm"
+                  className={`w-8 h-8 p-0 ${currentPage === page ? "bg-primary-500 text-white" : "text-gray-600"}`}
+                  onClick={() => handlePageChange(page)}
+                >
+                  {page}
+                </Button>
+              ))}
+              <Button
+                variant="outline"
+                size="icon"
+                className="w-8 h-8 p-0"
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        // Ticket History View
+        <div className="bg-white shadow-sm border border-gray-200 rounded-2xl p-6">
+          <div className="text-center text-gray-500">
+            <p className="text-lg font-medium mb-2">No Ticket History Available</p>
+            <p className="text-sm">Ticket history will be displayed here once available.</p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

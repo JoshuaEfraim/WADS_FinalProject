@@ -196,7 +196,7 @@ export async function getAdminTickets(req, res) {
 
 export async function getTicketDetails(req, res) {
   try {
-    const user = await User.findOne({role: "ADMIN"});
+    const user = await User.findById(req.user.id);
 
     const ticket = await Ticket.findById(req.params.id).populate('userId', 'name email role');
     if (!ticket) return res.status(404).json({ message: 'Ticket not found' });
@@ -239,7 +239,7 @@ export async function getTicketByPriority(req, res) {
 
 export async function updateTicket(req, res) {
   try {
-    const user = await User.findOne({role: "ADMIN"});
+    const user = await User.findById(req.user.id);
     const ticket = await Ticket.findById(req.params.ticketId);
     if (!ticket) return res.status(404).json({ message: 'Ticket not found' });
 
