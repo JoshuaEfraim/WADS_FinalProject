@@ -1,5 +1,9 @@
 import User from '../models/user.js'
+<<<<<<< HEAD
 import Ticket from '../models/ticket.js'
+=======
+import Ticket from '../models/ticket.js';
+>>>>>>> origin
 import mongoose from "mongoose";
 import TicketReply from '../models/ticketReply.js'
 import approvedTicket from '../models/approvedTicket.js'
@@ -9,6 +13,8 @@ import notification from '../models/notification.js'
 
 export async function getAdminDashboardData(req, res) {
   try {
+
+    const now = new Date()
     // Total counts
     const totalUsers = await User.countDocuments();
     const totalTickets = await Ticket.countDocuments();
@@ -40,42 +46,6 @@ export async function getAdminDashboardData(req, res) {
       .limit(5)
       .populate("userId", "name email");
 
-    // Daily Chart (last 24 hours, grouped in 4-hour intervals)
-    const now = new Date();
-    const past24Hours = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-
-    const dailyChart = await Ticket.aggregate([
-      {
-        $match: {
-          createdAt: { $gte: past24Hours }
-        }
-      },
-      {
-        $project: {
-          interval: {
-            $concat: [
-              { $substr: [{ $hour: "$createdAt" }, 0, 2] },
-              "-",
-              {
-                $substr: [
-                  { $add: [{ $subtract: [{ $hour: "$createdAt" }, { $mod: [{ $hour: "$createdAt" }, 4] }] }, 4] },
-                  0,
-                  2
-                ]
-              }
-            ]
-          },
-          status: 1
-        }
-      },
-      {
-        $group: {
-          _id: { interval: "$interval", status: "$status" },
-          count: { $sum: 1 }
-        }
-      }
-    ]);
-
     // Weekly Chart (last 7 days grouped by day and status)
     const past7Days = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     const weeklyChart = await Ticket.aggregate([
@@ -105,7 +75,6 @@ export async function getAdminDashboardData(req, res) {
       prioritySummary,
       statusSummary,
       recentTickets,
-      dailyChart,
       weeklyChart
     });
   } catch (error) {
@@ -192,7 +161,23 @@ export async function getAdminTickets(req, res) {
     const tickets = await Ticket.find(filter)
       .skip(skip)
       .limit(limitNum)
-      .sort({ createdAt: sortOrder });
+      .sort({ createdAt: sortOrder })
+      .populate('userId', 'name email');
+
+    // Add total counts for specific statuses
+    const [
+      totalAwaitingApproval,
+      totalProcessing,
+      totalResolvedTickets
+    ] = await Promise.all([
+      Ticket.countDocuments({ status: "AWAITING_APPROVAL" }),
+      Ticket.countDocuments({ status: "PROCESSING" }),
+      Ticket.countDocuments({ status: "RESOLVED" })
+    ]);
+
+    // Get status and priority options from Ticket schema
+    const statusOptions = Ticket.schema.path('status').enumValues;
+    const priorityOptions = Ticket.schema.path('priority').enumValues;
 
     return res.status(200).json({
       success: true,
@@ -200,7 +185,12 @@ export async function getAdminTickets(req, res) {
       limit: limitNum,
       totalPages: Math.ceil(totalTickets / limitNum),
       totalTickets,
-      tickets
+      totalAwaitingApproval,
+      totalProcessing,
+      totalResolvedTickets,
+      tickets,
+      statusOptions,
+      priorityOptions
     });
   } catch (error) {
     console.error(error);

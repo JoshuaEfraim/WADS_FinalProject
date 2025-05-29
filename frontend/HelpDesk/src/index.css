@@ -157,4 +157,93 @@
   body {
     @apply bg-background text-foreground;
   }
+  /* Priority Colors */
+.priority-high {
+  @apply bg-red-100 text-red-700 border-red-200;
 }
+
+.priority-medium {
+  @apply bg-yellow-100 text-yellow-700 border-yellow-200;
+}
+
+.priority-low {
+  @apply bg-green-100 text-green-700 border-green-200;
+}
+
+/* Priority Progress Colors */
+.priority-progress-high {
+  @apply bg-red-500;
+}
+
+.priority-progress-medium {
+  @apply bg-yellow-500;
+}
+
+.priority-progress-low {
+  @apply bg-green-500;
+}
+
+/* Status Colors */
+.status-resolved {
+  @apply bg-green-100 text-green-700 border-green-200;
+}
+
+.status-awaiting-approval {
+  @apply bg-purple-100 text-purple-700 border-purple-200;
+}
+
+.status-pending {
+  @apply bg-yellow-100 text-yellow-700 border-yellow-200;
+}
+
+.status-processing {
+  @apply bg-blue-100 text-blue-700 border-blue-200;
+}
+
+.status-rejected {
+  @apply bg-red-100 text-red-700 border-red-200;
+}
+
+/* Chart Colors */
+.chart-resolved {
+  color: #4A9C2E;
+}
+
+.chart-awaiting-approval {
+  color: #8B5CF6;
+}
+
+.chart-pending {
+  color: #F59E0B;
+}
+
+.chart-processing {
+  color: #1E266D;
+}
+
+.chart-rejected {
+  color: #EF4444;
+}
+
+/* Pie Chart Legend Colors */
+.legend-resolved {
+  @apply bg-green-500;
+}
+
+.legend-awaiting-approval {
+  @apply bg-purple-500;
+}
+
+.legend-pending {
+  @apply bg-yellow-500;
+}
+
+.legend-processing {
+  @apply bg-blue-600;
+}
+
+.legend-rejected {
+  @apply bg-red-500;
+}
+}
+
