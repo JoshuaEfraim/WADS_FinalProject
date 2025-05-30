@@ -122,6 +122,13 @@ export async function getAllUsers(req, res) {
 
 export async function getAdminTickets(req, res) {
   try {
+
+    const user = await User.findById(req.user.id);
+
+    if (user.role !== "ADMIN") {
+      return res.status(403).json({ message: "You are not authorized to access this resource" });
+    }
+
     const { page, limit, search, sort, status, priority } = req.query;
 
     const pageNum = parseInt(page) || 1;
@@ -300,9 +307,6 @@ export async function updateTicket(req, res) {
     res.status(500).json({ message: 'Error updating ticket', error: error.message });
   }
 }
-
-
-
 
 export async function deleteTicket(req, res) {
   try {
