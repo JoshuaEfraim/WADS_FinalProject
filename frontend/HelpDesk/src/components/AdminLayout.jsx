@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { Search, Settings, Menu, LayoutDashboard, Ticket, Users, Bell, X } from "lucide-react"
+import { Outlet, useLocation } from "react-router-dom"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -8,6 +9,7 @@ import { Separator } from "@/components/ui/separator"
 const AdminLayout = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const location = useLocation()
 
   const navItems = [
     { icon: LayoutDashboard, label: "Dashboard", href: "/admin/dashboard" },
@@ -15,6 +17,10 @@ const AdminLayout = ({ children }) => {
     { icon: Users, label: "Users", href: "/admin/users" },
     { icon: Settings, label: "Settings", href: "/admin/settings" },
   ]
+
+  const isActive = (path) => {
+    return location.pathname === path || location.pathname.startsWith(`${path}/`)
+  }
 
   return (
     <div className="flex h-screen bg-background">
@@ -60,9 +66,13 @@ const AdminLayout = ({ children }) => {
             <a
               key={item.label}
               href={item.href}
-              className="flex items-center px-3 py-2 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
+              className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                isActive(item.href)
+                  ? "bg-primary-500 text-white"
+                  : "hover:bg-accent hover:text-accent-foreground"
+              }`}
             >
-              <item.icon className="h-5 w-5 mr-3" />
+              <item.icon className={`h-5 w-5 mr-3 ${isActive(item.href) ? "text-white" : ""}`} />
               {isSidebarOpen && <span>{item.label}</span>}
             </a>
           ))}
@@ -107,10 +117,14 @@ const AdminLayout = ({ children }) => {
               <a
                 key={item.label}
                 href={item.href}
-                className="flex items-center px-3 py-2 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
+                className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                  isActive(item.href)
+                    ? "bg-primary-500 text-white"
+                    : "hover:bg-accent hover:text-accent-foreground"
+                }`}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                <item.icon className="h-5 w-5 mr-3" />
+                <item.icon className={`h-5 w-5 mr-3 ${isActive(item.href) ? "text-white" : ""}`} />
                 <span>{item.label}</span>
               </a>
             ))}
@@ -162,7 +176,7 @@ const AdminLayout = ({ children }) => {
         </header>
 
         {/* Main Content Area */}
-        <main className="bg-accent flex-1 p-4 lg:p-6 overflow-auto min-w-0">{children}</main>
+        <main className="bg-accent flex-1 p-4 lg:p-6 overflow-auto min-w-0"><Outlet/></main>
       </div>
     </div>
   )

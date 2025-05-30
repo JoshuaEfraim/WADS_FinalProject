@@ -123,64 +123,107 @@ export async function getAllUsers(req, res) {
 export async function getAdminTickets(req, res) {
   try {
 
-    const user = await User.findById(req.user.id);
-
+    // const user = await User.findById(req.user.id);
+    const user = await User.findOne({role: "ADMIN"});  // testing purposes
     if (user.role !== "ADMIN") {
       return res.status(403).json({ message: "You are not authorized to access this resource" });
     }
 
     const { page, limit, search, sort, status, priority } = req.query;
-
     const pageNum = parseInt(page) || 1;
     const limitNum = parseInt(limit) || 5;
     const searchQuery = search || "";
     const sortOrder = sort === "desc" ? -1 : 1;
     const skip = (pageNum - 1) * limitNum;
 
-    const filter = {};
-
-    // Search by subject using regex (case-insensitive)
-    const searchConditions = [];
-    if (searchQuery) {
-      searchConditions.push({ subject: { $regex: searchQuery, $options: "i" } });
-
-      // Check if searchQuery is a valid ObjectId
-      if (mongoose.Types.ObjectId.isValid(searchQuery)) {
-        searchConditions.push({ _id: searchQuery });
+    // Base aggregation pipeline stages
+    const baseStages = [
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'userData'
+        }
+      },
+      {
+        $unwind: '$userData'
       }
+    ];
 
-      filter.$or = searchConditions;
-    }
+    // Search conditions
+    const searchMatch = searchQuery ? {
+      $or: [
+        { subject: { $regex: searchQuery, $options: "i" } },
+        { 'userData.name': { $regex: searchQuery, $options: "i" } },
+        { 'userData.email': { $regex: searchQuery, $options: "i" } },
+        ...(mongoose.Types.ObjectId.isValid(searchQuery) ? [{ _id: new mongoose.Types.ObjectId(searchQuery) }] : [])
+      ]
+    } : {};
 
-    if (status) {
-      filter.status = status.toUpperCase();
-    }
+    // Status and priority filters
+    const filters = {
+      ...(status && status !== "ALL" ? { status: status.toUpperCase() } : {}),
+      ...(priority && priority !== "ALL" ? { priority: priority.toUpperCase() } : {})
+    };
 
-    if (priority) {
-      filter.priority = priority.toUpperCase();
-    }
+    // Get tickets using aggregation
+    const tickets = await Ticket.aggregate([
+      ...baseStages,
+      {
+        $match: {
+          ...searchMatch,
+          ...filters
+        }
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'userId'
+        }
+      },
+      {
+        $unwind: '$userId'
+      },
+      {
+        $project: {
+          _id: 1,
+          subject: 1,
+          description: 1,
+          status: 1,
+          priority: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          'userId._id': 1,
+          'userId.name': 1,
+          'userId.email': 1
+        }
+      },
+      { $skip: skip },
+      { $limit: limitNum },
+      { $sort: { createdAt: sortOrder } }
+    ]);
 
-    const totalTickets = await Ticket.countDocuments(filter);
-    const tickets = await Ticket.find(filter)
-      .skip(skip)
-      .limit(limitNum)
-      .sort({ createdAt: sortOrder })
-      .populate('userId', 'name email');
+    // Get total count
+    const totalTickets = (await Ticket.aggregate([
+      ...baseStages,
+      {
+        $match: {
+          ...searchMatch,
+          ...filters
+        }
+      },
+      { $count: 'total' }
+    ]))[0]?.total || 0;
 
-    // Add total counts for specific statuses
-    const [
-      totalAwaitingApproval,
-      totalProcessing,
-      totalResolvedTickets
-    ] = await Promise.all([
+    // Get status counts
+    const [totalAwaitingApproval, totalProcessing, totalResolvedTickets] = await Promise.all([
       Ticket.countDocuments({ status: "AWAITING_APPROVAL" }),
       Ticket.countDocuments({ status: "PROCESSING" }),
       Ticket.countDocuments({ status: "RESOLVED" })
     ]);
-
-    // Get status and priority options from Ticket schema
-    const statusOptions = Ticket.schema.path('status').enumValues;
-    const priorityOptions = Ticket.schema.path('priority').enumValues;
 
     return res.status(200).json({
       success: true,
@@ -192,8 +235,8 @@ export async function getAdminTickets(req, res) {
       totalProcessing,
       totalResolvedTickets,
       tickets,
-      statusOptions,
-      priorityOptions
+      statusOptions: Ticket.schema.path('status').enumValues,
+      priorityOptions: Ticket.schema.path('priority').enumValues
     });
   } catch (error) {
     console.error(error);
@@ -203,8 +246,11 @@ export async function getAdminTickets(req, res) {
 
 export async function getTicketDetails(req, res) {
   try {
-    const user = await User.findById(req.user.id);
 
+    // const user = await User.findById(req.user.id);
+    // const user = await User.findOne({role: "ADMIN"});
+    const user = await User.findOne({role: "ADMIN"});
+    
     const ticket = await Ticket.findById(req.params.id).populate('userId', 'name email role');
     if (!ticket) return res.status(404).json({ message: 'Ticket not found' });
 
@@ -246,7 +292,8 @@ export async function getTicketByPriority(req, res) {
 
 export async function updateTicket(req, res) {
   try {
-    const user = await User.findById(req.user.id);
+    // const user = await User.findById(req.user.id);
+    const user = await User.findOne({role: "ADMIN"});
     const ticket = await Ticket.findById(req.params.ticketId);
     if (!ticket) return res.status(404).json({ message: 'Ticket not found' });
 

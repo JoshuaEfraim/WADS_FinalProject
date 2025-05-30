@@ -20,7 +20,7 @@ function getStatusClass(status) {
   const classes = {
     RESOLVED: "status-resolved",
     IN_PROGRESS: "status-pending",
-    NEW_TICKET: "status-awaiting-approval",
+    AWAITING_APPROVAL: "status-awaiting-approval",
     PENDING: "status-pending",
     PROCESSING: "status-processing",
     REJECTED: "status-rejected",
@@ -261,8 +261,8 @@ const AllTickets = () => {
             </div>
           </div>
           {/* Filter/Sort Bar (right) */}
-          <div className="flex flex-wrap items-center gap-2">
-            <Button variant="outline" size="sm" className="flex items-center gap-1 text-xs" onClick={handleSortChange}>
+          <div className="flex flex-wrap items-center gap-4">
+            <Button variant="outline" size="sm" className="flex items-center gap-1 text-xs hover:bg-primary-500 hover:text-white" onClick={handleSortChange}>
               <ArrowUpDown className="w-4 h-4" />
               Sort
             </Button>
@@ -270,7 +270,7 @@ const AllTickets = () => {
               <Button
                 variant="outline"
                 size="sm"
-                className="flex items-center gap-1 text-xs min-w-[110px]"
+                className="flex items-center gap-1 text-xs min-w-[110px] hover:bg-primary-500 hover:text-white transition-colors"
                 onClick={() => setShowStatusDropdown((v) => !v)}
               >
                 Status: <span className="font-semibold ml-1">{selectedStatus.replace("_", " ")}</span>
@@ -281,7 +281,7 @@ const AllTickets = () => {
                   {statusOptions.map((status) => (
                     <button
                       key={status}
-                      className={`w-full text-left px-4 py-2 text-xs hover:bg-primary-50 ${selectedStatus === status ? "bg-primary-100 font-semibold" : ""}`}
+                      className={`w-full text-left px-4 py-2 text-xs hover:bg-secondary-300 hover:text-white cursor-pointer ${selectedStatus === status ? "bg-secondary-500 text-white font-semibold" : ""}`}
                       onClick={() => handleStatusSelect(status)}
                     >
                       {status.replace("_", " ")}
@@ -294,7 +294,7 @@ const AllTickets = () => {
               <Button
                 variant="outline"
                 size="sm"
-                className="flex items-center gap-1 text-xs min-w-[110px]"
+                className="flex items-center gap-1 text-xs min-w-[110px] hover:bg-primary-500 hover:text-white transition-colors"
                 onClick={() => setShowPriorityDropdown((v) => !v)}
               >
                 Priority: <span className="font-semibold ml-1">{selectedPriority}</span>
@@ -305,7 +305,7 @@ const AllTickets = () => {
                   {priorityOptions.map((priority) => (
                     <button
                       key={priority}
-                      className={`w-full text-left px-4 py-2 text-xs hover:bg-primary-50 ${selectedPriority === priority ? "bg-primary-100 font-semibold" : ""}`}
+                      className={`w-full text-left px-4 py-2 text-xs hover:bg-secondary-300 hover:text-white cursor-pointer ${selectedPriority === priority ? "bg-secondary-500 text-white font-semibold" : ""}`}
                       onClick={() => handlePrioritySelect(priority)}
                     >
                       {priority}
@@ -322,20 +322,20 @@ const AllTickets = () => {
           <Table>
             <TableHeader>
               <TableRow className="bg-gray-50">
-                <TableHead className="font-semibold text-gray-700 text-xs w-12 text-center">ID</TableHead>
-                <TableHead className="font-semibold text-gray-700 text-xs text-center">Requested By</TableHead>
-                <TableHead className="font-semibold text-gray-700 text-xs text-center">Short Description</TableHead>
-                <TableHead className="font-semibold text-gray-700 text-xs text-center">Priority Level</TableHead>
-                <TableHead className="font-semibold text-gray-700 text-xs text-center">Status</TableHead>
-                <TableHead className="font-semibold text-gray-700 text-xs text-center">Created Date</TableHead>
-                <TableHead className="font-semibold text-gray-700 text-xs text-center">Updated Date</TableHead>
-                <TableHead className="font-semibold text-gray-700 text-xs text-center">Action</TableHead>
+                <TableHead className="font-semibold text-primary-400 text-sm w-12 text-center">ID</TableHead>
+                <TableHead className="font-semibold text-primary-400 text-sm text-center">Requested By</TableHead>
+                <TableHead className="font-semibold text-primary-400 text-sm text-center">Short Description</TableHead>
+                <TableHead className="font-semibold text-primary-400 text-sm text-center">Priority Level</TableHead>
+                <TableHead className="font-semibold text-primary-400 text-sm text-center">Status</TableHead>
+                <TableHead className="font-semibold text-primary-400 text-sm text-center">Created Date</TableHead>
+                <TableHead className="font-semibold text-primary-400 text-sm text-center">Updated Date</TableHead>
+                <TableHead className="font-semibold text-primary-400 text-sm text-center">Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {tickets.map((ticket) => (
                 <TableRow key={ticket._id} className="border-gray-100 hover:bg-gray-50">
-                  <TableCell className="font-medium text-sm text-gray-900 text-center">{ticket._id}</TableCell>
+                  <TableCell className="font-semibold text-sm text-gray-900 text-center">{ticket._id}</TableCell>
                   <TableCell className= "text-center">
                     <div className="flex items-center justify-center gap-2">
                       <Avatar className="w-6 h-6">
@@ -343,22 +343,22 @@ const AllTickets = () => {
                           {ticket.userId && ticket.userId.name ? ticket.userId.name.charAt(0) : "?"}
                         </AvatarFallback>
                       </Avatar>
-                      <span className="text-sm font-medium text-gray-900">
+                      <span className="text-sm font-bold text-gray-900">
                         {ticket.userId && ticket.userId.name ? ticket.userId.name : "Unknown"}
                       </span>
                     </div>
                   </TableCell>
-                  <TableCell className="text-sm text-gray-900 text-center">{ticket.subject}</TableCell>
+                  <TableCell className="text-sm text-gray-900 text-center font-regular">{ticket.subject}</TableCell>
                   <TableCell className= "text-center">
                     <span
-                      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${getPriorityClass(ticket.priority)}`}
+                      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border ${getPriorityClass(ticket.priority)}`}
                     >
                       {ticket.priority === "HIGH" ? "High" : ticket.priority === "MEDIUM" ? "Medium" : "Low"}
                     </span>
                   </TableCell>
                   <TableCell className= "text-center">
                     <span
-                      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${getStatusClass(ticket.status)}`}
+                      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border ${getStatusClass(ticket.status)}`}
                     >
                       {ticket.status === "PENDING"
                         ? "Pending"
@@ -369,10 +369,10 @@ const AllTickets = () => {
                           : "Awaiting Approval"}
                     </span>
                   </TableCell>
-                  <TableCell className="text-sm text-gray-900 text-center">{new Date(ticket.createdAt).toLocaleDateString()}</TableCell>
-                  <TableCell className="text-sm text-gray-900 text-center">{new Date(ticket.updatedAt).toLocaleDateString()}</TableCell>
+                  <TableCell className="text-sm text-gray-900 text-center font-semibold">{new Date(ticket.createdAt).toLocaleDateString()}</TableCell>
+                  <TableCell className="text-sm text-gray-900 text-center font-semibold">{new Date(ticket.updatedAt).toLocaleDateString()}</TableCell>
                   <TableCell className="text-center">
-                    <Button variant="outline" size="sm" className="text-xs rounded-full" onClick={() => navigate(`/admin/tickets/${ticket._id}`)}>
+                    <Button variant="outline" size="sm" className="text-xs font-semibold rounded-full border-primary-500 text-primary-500 hover:bg-primary-500 hover:border-none hover:text-white" onClick={() => navigate(`/admin/tickets/${ticket._id}`)}>
                       View Details
                     </Button>
                   </TableCell>
@@ -388,23 +388,26 @@ const AllTickets = () => {
             <div key={ticket._id} className="bg-gray-50 rounded-lg p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-bold text-gray-900">#{ticket._id}</span>
                   <Avatar className="w-6 h-6">
                     <AvatarFallback className="text-xs bg-gray-200 text-gray-700">
                       {ticket.userId && ticket.userId.name ? ticket.userId.name.charAt(0) : "?"}
                     </AvatarFallback>
                   </Avatar>
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className="text-sm font-bold text-gray-900">
                     {ticket.userId && ticket.userId.name ? ticket.userId.name : "Unknown"}
                   </span>
                 </div>
-                <Button variant="outline" size="sm" className="text-xs rounded-full" onClick={() => navigate(`/admin/tickets/${ticket._id}`)}>
+                <Button variant="outline" size="sm" className="text-xs rounded-full hover:bg-primary-500 hover:text-white" onClick={() => navigate(`/admin/tickets/${ticket._id}`)}>
                   View
                 </Button>
               </div>
 
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-gray-900">#{ticket._id}</span>
+              </div>
+
               <div>
-                <p className="text-sm font-medium text-gray-900 mb-1">{ticket.subject}</p>
+                <p className="text-sm font-semibold text-gray-900 mb-1">{ticket.subject}</p>
               </div>
 
               <div className="flex flex-wrap gap-2">
@@ -426,10 +429,10 @@ const AllTickets = () => {
 
               <div className="grid grid-cols-2 gap-2 text-xs text-gray-500">
                 <div>
-                  <span className="font-medium">Created:</span> {new Date(ticket.createdAt).toLocaleDateString()}
+                  <span className="font-semibold">Created:</span> {new Date(ticket.createdAt).toLocaleDateString()}
                 </div>
                 <div>
-                  <span className="font-medium">Updated:</span> {new Date(ticket.updatedAt).toLocaleDateString()}
+                  <span className="font-semibold">Updated:</span> {new Date(ticket.updatedAt).toLocaleDateString()}
                 </div>
               </div>
             </div>

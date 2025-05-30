@@ -157,7 +157,7 @@ const AdminDashboard = () => {
     <div className=" space-y-3 min-h-screen font-regular">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-primary-500 px-2">Dashboard</h1>
+        <h1 className="text-2xl  font-bold text-primary-500 px-2">Dashboard</h1>
       </div>
 
       {/* Stats Cards */}
@@ -256,8 +256,8 @@ const AdminDashboard = () => {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-lg font-semibold text-gray-900">Recent Tickets</CardTitle>
-                <p className="text-xs text-gray-500 mt-1">View the latest 5 tickets</p>
+                <CardTitle className="text-2xl font-bold text-primary-500">Recent Tickets</CardTitle>
+                <p className="text-sm text-gray-600 mt-1">View the latest 5 tickets</p>
               </div>
               <div className="flex items-center gap-2">
                 <Button variant="outline" size="sm" className="text-xs">
@@ -277,17 +277,17 @@ const AdminDashboard = () => {
               <Table>
                 <TableHeader>
                   <TableRow className="border-gray-200">
-                    <TableHead className="font-semibold text-gray-700 text-xs">ID</TableHead>
-                    <TableHead className="font-semibold text-gray-700 text-xs">Requested By</TableHead>
-                    <TableHead className="font-semibold text-gray-700 text-xs">Short Description</TableHead>
-                    <TableHead className="font-semibold text-gray-700 text-xs">Priority Level</TableHead>
-                    <TableHead className="font-semibold text-gray-700 text-xs">Status</TableHead>
+                    <TableHead className="font-semibold text-primary-400 text-sm">ID</TableHead>
+                    <TableHead className="font-semibold text-primary-400 text-sm">Requested By</TableHead>
+                    <TableHead className="font-semibold text-primary-400 text-sm">Short Description</TableHead>
+                    <TableHead className="font-semibold text-primary-400 text-sm">Priority Level</TableHead>
+                    <TableHead className="font-semibold text-primary-400 text-sm">Status</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {recentTickets.map((ticket, index) => (
                     <TableRow key={ticket._id} className="border-gray-100 hover:bg-gray-50">
-                      <TableCell className="font-medium text-sm text-gray-900">{index + 1}</TableCell>
+                      <TableCell className="font-semibold text-sm text-gray-900">{index + 1}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <Avatar className="w-6 h-6">
@@ -295,25 +295,25 @@ const AdminDashboard = () => {
                               {ticket.userId?.name ? ticket.userId.name[0] : "U"}
                             </AvatarFallback>
                           </Avatar>
-                          <span className="text-sm font-medium text-gray-900">{ticket.userId?.name || "Unknown"}</span>
+                          <span className="text-sm font-bold  text-gray-900">{ticket.userId?.name || "Unknown"}</span>
                         </div>
                       </TableCell>
                       <TableCell className="max-w-xs">
                         <div>
-                          <div className="font-medium text-sm text-gray-900">{ticket.subject}</div>
+                          <div className="font-regular text-sm text-gray-900">{ticket.subject}</div>
                           <div className="text-xs text-gray-500 mt-0.5">{ticket.description}</div>
                         </div>
                       </TableCell>
                       <TableCell>
                         <span
-                          className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${priorityColors[ticket.priority]}`}
+                          className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border ${priorityColors[ticket.priority]}`}
                         >
                           {ticket.priority}
                         </span>
                       </TableCell>
                       <TableCell>
                         <span
-                          className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${statusColors[ticket.status] || "bg-gray-100 text-gray-800 border-gray-200"}`}
+                          className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border ${statusColors[ticket.status] || "bg-gray-100 text-gray-800 border-gray-200"}`}
                         >
                           {ticket.status
                             .replace("_", " ")
@@ -332,8 +332,8 @@ const AdminDashboard = () => {
         {/* Ticket Status Summary */}
         <Card className="bg-white shadow-sm border border-gray-200">
           <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-semibold text-gray-900">Ticket Status Summary</CardTitle>
-            <p className="text-xs text-gray-500 mt-1">Chart representing status of tickets in the system</p>
+            <CardTitle className="text-2xl font-bold text-primary-500">Ticket Status Summary</CardTitle>
+            <p className="text-sm text-gray-500 mt-1/2">Chart representing status of tickets in the system</p>
           </CardHeader>
           <CardContent className="flex flex-col items-center">
             <div className="relative w-32 h-32 mb-6">
@@ -372,7 +372,9 @@ const AdminDashboard = () => {
             </div>
 
             <div className="w-full space-y-2">
-              {pieData.map((slice) => {
+              {["AWAITING_APPROVAL", "PENDING", "PROCESSING", "RESOLVED", "REJECTED"].map((status) => {
+                const slice = pieData.find((s) => s.label === status)
+                if (!slice) return null
                 const colors = {
                   RESOLVED: "bg-green-500",
                   AWAITING_APPROVAL: "bg-purple-500",
@@ -380,7 +382,6 @@ const AdminDashboard = () => {
                   PROCESSING: "bg-blue-600",
                   REJECTED: "bg-red-500",
                 }
-
                 const labels = {
                   RESOLVED: "Resolved",
                   AWAITING_APPROVAL: "Awaiting Approval",
@@ -388,12 +389,11 @@ const AdminDashboard = () => {
                   PROCESSING: "Processing",
                   REJECTED: "Rejected",
                 }
-
                 return (
                   <div key={slice.label} className="flex items-center justify-between text-sm">
                     <div className="flex items-center gap-2">
                       <div className={`w-3 h-3 rounded-full ${colors[slice.label] || "bg-gray-400"}`}></div>
-                      <span className="text-gray-700 text-xs">{labels[slice.label]}</span>
+                      <span className="text-gray-900 font-semibold text-xs">{labels[slice.label]}</span>
                     </div>
                     <span className="font-semibold text-gray-900 text-xs">{slice.value}</span>
                   </div>
@@ -407,10 +407,35 @@ const AdminDashboard = () => {
       {/* Report Chart */}
       <Card className="bg-white shadow-sm border border-gray-200">
         <CardHeader className="pb-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <CardTitle className="text-lg font-semibold text-gray-900">Report</CardTitle>
-              <p className="text-xs text-gray-500 mt-1">This is a weekly ticket report for the last 7 days. Hover over the lines to see the data for each day.</p>
+              <CardTitle className="text-2xl font-bold text-primary-500">Report</CardTitle>
+              <p className="text-sm text-gray-900 mt-1">This is a weekly ticket report for the last 7 days. Hover over the lines to see the data for each day.</p>
+            </div>
+            {/* Custom Legend */}
+            <div className="flex flex-wrap gap-4 mt-3 sm:mt-0">
+              {["RESOLVED", "AWAITING_APPROVAL", "PENDING", "PROCESSING", "REJECTED"].map((status) => {
+                const colors = {
+                  RESOLVED: "#4A9C2E",
+                  AWAITING_APPROVAL: "#8B5CF6",
+                  PENDING: "#F59E0B",
+                  PROCESSING: "#1E266D",
+                  REJECTED: "#EF4444",
+                }
+                const labels = {
+                  RESOLVED: "Resolved",
+                  AWAITING_APPROVAL: "Awaiting Approval",
+                  PENDING: "Pending",
+                  PROCESSING: "Processing",
+                  REJECTED: "Rejected",
+                }
+                return (
+                  <div key={status} className="flex items-center gap-1">
+                    <span className="w-3 h-3 rounded-full" style={{ background: colors[status], display: 'inline-block' }}></span>
+                    <span className="text-xs text-gray-700 font-medium">{labels[status]}</span>
+                  </div>
+                )
+              })}
             </div>
           </div>
         </CardHeader>
@@ -426,13 +451,6 @@ const AdminDashboard = () => {
                   labelStyle={{ color: 'white', fontWeight: 600 }}
                   itemStyle={{ color: 'white', fontWeight: 500 }}
                   formatter={(value, name) => [value, statusLabels[name] || name]}
-                />
-                <Legend
-                  verticalAlign="top"
-                  align="right"
-                  iconType="circle"
-                  wrapperStyle={{ fontSize: 13, marginBottom: 10 }}
-                  formatter={(value) => <span style={{ color: '#374151', fontWeight: 500 }}>{statusLabels[value] || value}</span>}
                 />
                 {chartStatuses.map((status) => (
                   <Line

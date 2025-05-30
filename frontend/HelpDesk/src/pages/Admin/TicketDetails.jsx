@@ -35,10 +35,10 @@ const priorityColors = {
 }
 
 const statusColors = {
-  AWAITING_APPROVAL: "bg-blue-100 text-blue-800 border-blue-200",
-  PENDING: "bg-yellow-100 text-yellow-800 border-yellow-200",
+  AWAITING_APPROVAL: " bg-purple-100 text-purple-700 border-purple-200",
+  PENDING: "bg-yellow-100 text-yellow-700 border-yellow-200",
   REJECTED: "bg-red-100 text-red-800 border-red-200",
-  PROCESSING: "bg-purple-100 text-purple-800 border-purple-200",
+  PROCESSING: " bg-blue-100 text-blue-700 border-blue-200",
   RESOLVED: "bg-green-100 text-green-800 border-green-200",
 }
 
@@ -175,18 +175,18 @@ export default function TicketDetails() {
 
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-slate-900 mb-2">Ticket Details</h1>
+              <h1 className="text-3xl font-bold text-primary-500 mb-2">Ticket Details</h1>
               <p className="text-slate-600">Manage and update ticket information</p>
             </div>
 
             {!edit ? (
-              <Button onClick={() => setEdit(true)} className="bg-blue-600 hover:bg-blue-700">
+              <Button onClick={() => setEdit(true)} className="bg-white text-primary-500  hover:bg-primary-500 hover:text-white">
                 <Edit3 className="w-4 h-4 mr-2" />
                 Edit Ticket
               </Button>
             ) : (
               <div className="flex gap-2">
-                <Button onClick={handleUpdate} disabled={saving} className="bg-green-600 hover:bg-green-700">
+                <Button onClick={handleUpdate} disabled={saving} className="bg-white text-primary-500 hover:bg-secondary-500 hover:text-white">
                   {saving ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -199,7 +199,7 @@ export default function TicketDetails() {
                     </>
                   )}
                 </Button>
-                <Button variant="outline" onClick={handleCancel} disabled={saving}>
+                <Button variant="outline" onClick={handleCancel} disabled={saving} className="bg-white text-primary-500 hover:bg-secondary-500 hover:text-white">
                   <X className="w-4 h-4 mr-2" />
                   Cancel
                 </Button>
@@ -232,15 +232,15 @@ export default function TicketDetails() {
               <CardHeader className="pb-4">
                 <div className="flex items-start justify-between">
                   <div>
-                    <CardTitle className="text-xl text-slate-900 mb-2">{ticket.subject}</CardTitle>
+                    <CardTitle className="text-xl font-bold text-slate-900 mb-2">{ticket.subject}</CardTitle>
                     <div className="flex items-center gap-4 text-sm text-slate-600">
                       <div className="flex items-center gap-1">
                         <Hash className="w-4 h-4" />
-                        <span className="font-mono">{ticket._id}</span>
+                        <span className="font-semibold">{ticket._id}</span>
                       </div>
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 font-semibold">
                     <Badge className={priorityColors[ticket.priority]}>{formatPriority(ticket.priority)}</Badge>
                     <Badge className={statusColors[ticket.status]}>{formatStatus(ticket.status)}</Badge>
                   </div>
@@ -251,7 +251,7 @@ export default function TicketDetails() {
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     <FileText className="w-4 h-4 text-slate-500" />
-                    <span className="font-medium text-slate-900">Description</span>
+                    <span className="font-bold text-slate-900">Description</span>
                   </div>
                   <div className="bg-slate-50 rounded-lg p-4 text-slate-700 leading-relaxed min-h-[60px]">
                     {ticket.description}
@@ -263,7 +263,7 @@ export default function TicketDetails() {
                 {/* Editable Fields */}
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Priority</label>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">Priority</label>
                     {edit ? (
                       <Select value={form.priority} onValueChange={(v) => handleChange("priority", v)}>
                         <SelectTrigger className="w-full">
@@ -292,7 +292,7 @@ export default function TicketDetails() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Status</label>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">Status</label>
                     {edit ? (
                       <Select value={form.status} onValueChange={(v) => handleChange("status", v)}>
                         <SelectTrigger className="w-full">
@@ -337,17 +337,17 @@ export default function TicketDetails() {
             {/* Requester Information */}
             <Card className="shadow-sm border-slate-200">
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <User className="w-5 h-5 text-slate-500" />
+                <CardTitle className="text-lg flex items-center gap-2 font-bold">
+                  <User className="w-5 h-5 text-primary-500" />
                   Requester
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
-                  <div className="font-medium text-slate-900">{ticket.userId?.name || "Unknown"}</div>
+                  <div className="font-bold text-slate-900">{ticket.userId?.name || "Unknown"}</div>
                   {ticket.userId?.email && (
-                    <div className="flex items-center gap-1 text-sm text-slate-600">
-                      <Mail className="w-3 h-3" />
+                    <div className="flex items-center gap-1 text-sm text-primary-400">
+                      <Mail className="w-3 h-4" />
                       {ticket.userId.email}
                     </div>
                   )}
@@ -358,8 +358,8 @@ export default function TicketDetails() {
             {/* Timeline */}
             <Card className="shadow-sm border-slate-200">
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-slate-500" />
+                <CardTitle className="text-lg flex items-center gap-2 font-bold">
+                  <Clock className="w-5 h-5 text-primary-500" />
                   Timeline
                 </CardTitle>
               </CardHeader>
@@ -367,8 +367,8 @@ export default function TicketDetails() {
                 <div className="flex items-start gap-3">
                   <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
                   <div>
-                    <div className="text-sm font-medium text-slate-900">Created</div>
-                    <div className="text-xs text-slate-600 flex items-center gap-1">
+                    <div className="text-sm font-semibold text-slate-900">Created</div>
+                    <div className="text-xs font-semibold text-slate-600 flex items-center gap-1">
                       <Calendar className="w-3 h-3" />
                       {formatDate(ticket.createdAt)}
                     </div>
@@ -378,8 +378,8 @@ export default function TicketDetails() {
                 <div className="flex items-start gap-3">
                   <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
                   <div>
-                    <div className="text-sm font-medium text-slate-900">Last Updated</div>
-                    <div className="text-xs text-slate-600 flex items-center gap-1">
+                    <div className="text-sm font-semibold text-slate-900">Last Updated</div>
+                    <div className="text-xs font-semibold text-slate-600 flex items-center gap-1">
                       <Calendar className="w-3 h-3" />
                       {formatDate(ticket.updatedAt)}
                     </div>
