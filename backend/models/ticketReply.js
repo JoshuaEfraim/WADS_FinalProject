@@ -18,9 +18,6 @@ const ticketReplySchema = new mongoose.Schema({
 }, { timestamps: true });
 
 const TicketReply = mongoose.model('TicketReply', ticketReplySchema);
-<<<<<<< HEAD
-=======
 
->>>>>>> origin
 export default TicketReply;
 

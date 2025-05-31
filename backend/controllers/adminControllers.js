@@ -1,9 +1,5 @@
 import User from '../models/user.js'
-<<<<<<< HEAD
-import Ticket from '../models/ticket.js'
-=======
 import Ticket from '../models/ticket.js';
->>>>>>> origin
 import mongoose from "mongoose";
 import TicketReply from '../models/ticketReply.js'
 import approvedTicket from '../models/approvedTicket.js'
@@ -200,8 +196,8 @@ export async function getAdminTickets(req, res) {
 
 export async function getTicketDetails(req, res) {
   try {
-    const user = await User.findById(req.user.id);
-
+    // const user = await User.findById(req.user.id);
+    const user = await User.findOne({role:"ADMIN"})
     const ticket = await Ticket.findById(req.params.id).populate('userId', 'name email role');
     if (!ticket) return res.status(404).json({ message: 'Ticket not found' });
 

@@ -1,4 +1,27 @@
-import { protect } from '../middleware/authMiddleware.js';
+// import express from 'express';
+// const router = express.Router();
+
+// import {
+//   getAllResolvedTickets,
+//   getTicketReply,
+//   replyToTicket,
+//   getUserTicketHistory,
+//   getTicketDetails
+// } from '../controllers/ticketController.js';
+
+
+// // POST a reply to a ticket (protected)
+// router.post('/reply/:id', replyToTicket);
+
+// // GET all resolved tickets (admin view - protected)
+// router.get('/history/admin', getAllResolvedTickets);
+
+// // GET resolved tickets for a specific user (protected)
+// router.get('/history/user/:userId', getUserTicketHistory);
+
+// router.get('/ticketReply/:id', getTicketReply);
+
+// export default router;
 import express from 'express';
 const router = express.Router();
 
@@ -6,21 +29,19 @@ import {
   getAllResolvedTickets,
   getTicketReply,
   replyToTicket,
-  getUserTicketHistory
+  getUserTicketHistory,
+  getTicketDetails
 } from '../controllers/ticketController.js';
 
-// ✅ Use `protect` middleware for all routes that need authentication
+// Ticket reply routes
+router.post('/reply/:id', replyToTicket);
+router.get('/ticketReply/:id', getTicketReply);
 
-// GET all replies for a ticket (protected)
-router.get('/:id/replies', protect, getTicketReply);
+// Ticket history routes
+router.get('/history/user/:userId', getUserTicketHistory);
+router.get('/history/resolved', getAllResolvedTickets);
 
-// POST a reply to a ticket (protected)
-router.post('/reply/:id', protect, replyToTicket);
+// Ticket details route
+router.get('/:id', getTicketDetails);
 
-// GET all resolved tickets (admin view - protected)
-router.get('/history/admin', protect, getAllResolvedTickets);
-
-// GET resolved tickets for a specific user (protected)
-router.get('/history/user/:userId', protect, getUserTicketHistory);
-
-export default router;
+export default router; 

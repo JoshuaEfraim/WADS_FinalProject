@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, Ticket, Clock, Settings, CheckCircle, ArrowUpDown, ChevronDown, Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { useSearchParams, useNavigate } from "react-router-dom"
+import TicketHistory from "./TicketHistory"
 
 function getPriorityClass(priority) {
   const classes = {
@@ -67,7 +68,7 @@ const ManageTickets = () => {
 
   // Fetch global totals (unfiltered)
   useEffect(() => {
-    fetch("http://localhost:3000/api/admin/tickets?page=1&limit=1")
+    fetch("http://localhost:5000/api/admin/tickets?page=1&limit=1")
       .then(res => res.json())
       .then(data => {
         setGlobalTotals({
@@ -90,7 +91,7 @@ const ManageTickets = () => {
     })
 
     try {
-      const res = await fetch(`http://localhost:3000/api/admin/tickets?${params}`)
+      const res = await fetch(`http://localhost:5000/api/admin/tickets?${params}`)
       const data = await res.json()
       if (data.success) {
         setTickets(data.tickets)
@@ -511,8 +512,7 @@ const ManageTickets = () => {
         // Ticket History View
         <div className="bg-white shadow-sm border border-gray-200 rounded-2xl p-6">
           <div className="text-center text-gray-500">
-            <p className="text-lg font-medium mb-2">No Ticket History Available</p>
-            <p className="text-sm">Ticket history will be displayed here once available.</p>
+            <TicketHistory/>
           </div>
         </div>
       )}
