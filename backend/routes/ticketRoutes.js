@@ -7,7 +7,9 @@ import {
   getAllResolvedTickets,
   getTicketReply,
   replyToTicket,
-  getUserTicketHistory
+  getUserTicketHistory,
+  getTicketDetails,
+  deleteTicket
 } from '../controllers/ticketController.js';
 
 // GET ticket details + all replies
@@ -21,5 +23,9 @@ router.get('/tickets/history/admin', getAllResolvedTickets);
 
 // GET resolved tickets for a specific user
 router.get('/tickets/history/user/:userId', getUserTicketHistory);
+
+router.get("/ticketDetails/:id", getTicketDetails)
+
+router.delete("/:ticketId", deleteTicket)
 
 export default router;

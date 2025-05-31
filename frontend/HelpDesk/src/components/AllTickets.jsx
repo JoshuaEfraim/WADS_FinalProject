@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { ChevronLeft, ChevronRight, Ticket, Clock, Settings, CheckCircle, ArrowUpDown, ChevronDown, Search } from "lucide-react"
+import { ChevronLeft, ChevronRight, Ticket, Clock, Settings, CheckCircle, ArrowUpDown, ChevronDown, Search, AlertTriangle, Trash2 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { useSearchParams, useNavigate } from "react-router-dom"
 
@@ -31,6 +31,8 @@ function getStatusClass(status) {
 const AllTickets = () => {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
+  const [ticketToDelete, setTicketToDelete] = useState(null)
+  const [isDeleting, setIsDeleting] = useState(false)
   
   // Initialize state from URL params
   const [currentPage, setCurrentPage] = useState(Number(searchParams.get('page')) || 1)
@@ -161,6 +163,42 @@ const AllTickets = () => {
     }
   }
 
+  // Update delete handler
+  const handleDeleteTicket = async (ticketId) => {
+    setTicketToDelete(ticketId);
+  };
+
+  const confirmDelete = async () => {
+    if (!ticketToDelete) return;
+    
+    setIsDeleting(true);
+    try {
+      const response = await fetch(`http://localhost:3000/api/tickets/${ticketToDelete}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include'
+      });
+      const data = await response.json();
+      if (data.success) {
+        fetchTickets();
+      } else {
+        alert(data.message || 'Failed to delete ticket');
+      }
+    } catch (error) {
+      console.error('Error deleting ticket:', error);
+      alert('Error deleting ticket');
+    } finally {
+      setIsDeleting(false);
+      setTicketToDelete(null);
+    }
+  };
+
+  const cancelDelete = () => {
+    setTicketToDelete(null);
+  };
+
   return (
     <div className="space-y-6">
       {/* Stats Cards */}
@@ -262,9 +300,22 @@ const AllTickets = () => {
           </div>
           {/* Filter/Sort Bar (right) */}
           <div className="flex flex-wrap items-center gap-4">
-            <Button variant="outline" size="sm" className="flex items-center gap-1 text-xs hover:bg-primary-500 hover:text-white" onClick={handleSortChange}>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="flex items-center gap-1 text-xs hover:bg-primary-500 hover:text-white" 
+              onClick={handleSortChange}
+            >
               <ArrowUpDown className="w-4 h-4" />
-              Sort
+              {sortOrder === "asc" ? (
+                <span className="flex items-center gap-1">
+                  Sort: <span className="font-semibold">Oldest </span>
+                </span>
+              ) : (
+                <span className="flex items-center gap-1">
+                  Sort: <span className="font-semibold">Latest </span>
+                </span>
+              )}
             </Button>
             <div className="relative">
               <Button
@@ -372,9 +423,24 @@ const AllTickets = () => {
                   <TableCell className="text-sm text-gray-900 text-center font-semibold">{new Date(ticket.createdAt).toLocaleDateString()}</TableCell>
                   <TableCell className="text-sm text-gray-900 text-center font-semibold">{new Date(ticket.updatedAt).toLocaleDateString()}</TableCell>
                   <TableCell className="text-center">
-                    <Button variant="outline" size="sm" className="text-xs font-semibold rounded-full border-primary-500 text-primary-500 hover:bg-primary-500 hover:border-none hover:text-white" onClick={() => navigate(`/admin/tickets/${ticket._id}`)}>
-                      View Details
-                    </Button>
+                    <div className="flex items-center justify-center gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="text-xs font-semibold rounded-full border-primary-500 text-primary-500 hover:bg-primary-500 hover:border-none hover:text-white" 
+                        onClick={() => navigate(`/admin/tickets/${ticket._id}`)}
+                      >
+                        View Details
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        className="h-8 w-8 text-red-500 hover:bg-red-100 hover:text-red-600" 
+                        onClick={() => handleDeleteTicket(ticket._id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
@@ -397,9 +463,24 @@ const AllTickets = () => {
                     {ticket.userId && ticket.userId.name ? ticket.userId.name : "Unknown"}
                   </span>
                 </div>
-                <Button variant="outline" size="sm" className="text-xs rounded-full hover:bg-primary-500 hover:text-white" onClick={() => navigate(`/admin/tickets/${ticket._id}`)}>
-                  View
-                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="text-xs rounded-full hover:bg-primary-500 hover:text-white" 
+                    onClick={() => navigate(`/admin/tickets/${ticket._id}`)}
+                  >
+                    View
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    className="h-8 w-8 text-red-500 hover:bg-red-100 hover:text-red-600" 
+                    onClick={() => handleDeleteTicket(ticket._id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
 
               <div className="flex items-center gap-2">
@@ -474,6 +555,41 @@ const AllTickets = () => {
           </div>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {ticketToDelete && (
+        <div className="fixed inset-0 bg-gray-500/30 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-lg">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                <AlertTriangle className="w-6 h-6 text-red-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900">Delete Ticket</h3>
+            </div>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to delete this ticket? This action cannot be undone.
+            </p>
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="outline"
+                onClick={cancelDelete}
+                disabled={isDeleting}
+                className="text-gray-600 hover:bg-gray-100"
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={confirmDelete}
+                disabled={isDeleting}
+                className="bg-red-500 hover:bg-red-600 text-white"
+              >
+                {isDeleting ? 'Deleting...' : 'Delete Ticket'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

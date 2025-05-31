@@ -1,5 +1,7 @@
 import Ticket from '../models/ticket.js';
 import TicketReply from '../models/ticketReply.js';
+import User from '../models/user.js';
+import approvedTicket from '../models/approvedTicket.js';
 
 /**
  * POST /api/tickets/:id/reply
@@ -79,3 +81,63 @@ export const getUserTicketHistory = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+export async function deleteTicket(req, res) {
+  try {
+    const user = await User.findById(req.user.id);
+    // const user = await User.findOne({role:"ADMIN"}); //testing purposes
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const ticket = await Ticket.findById(req.params.ticketId);
+    if (!ticket) {
+      return res.status(404).json({ message: 'Ticket not found' });
+    }
+
+    // Check if user is admin or owns the ticket
+    if (user.role !== 'ADMIN' && ticket.userId.toString() !== user._id.toString()) {
+      return res.status(403).json({ message: 'You are not authorized to delete this ticket' });
+    }
+
+    await ticket.deleteOne();
+
+    res.status(200).json({ success: true, message: 'Ticket deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+}
+
+export async function getTicketDetails(req, res) {
+  try {
+
+    const user = await User.findById(req.user.id);  
+    // const user = await User.findOne({_id : '6837e04f9275f96ff3a3c9bb'});  // testing purposes
+    // const user = await User.findOne({role: "ADMIN"}); // testing purposes
+    
+    const ticket = await Ticket.findById(req.params.id).populate('userId', 'name email role');
+    if (!ticket) return res.status(404).json({ message: 'Ticket not found' });
+
+    if (user.role !== 'ADMIN' && ticket.userId._id.toString() !== "6837e04f9275f96ff3a3c9bb") {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+
+    // Get approval information if the ticket is approved
+    let approvalInfo = null;
+    if (ticket.status !== 'AWAITING_APPROVAL') {
+      const approval = await approvedTicket.findOne({ ticketId: ticket._id })
+        .populate('adminId', 'name email');
+      if (approval) {
+        approvalInfo = {
+          approvedBy: approval.adminId.name,
+          approvedAt: approval.createdAt
+        };
+      }
+    }
+
+    res.json({ ...ticket.toObject(), approvalInfo });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching ticket', error: error.message });
+  }
+}

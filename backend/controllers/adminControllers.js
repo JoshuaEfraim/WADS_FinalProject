@@ -123,8 +123,8 @@ export async function getAllUsers(req, res) {
 export async function getAdminTickets(req, res) {
   try {
 
-    // const user = await User.findById(req.user.id);
-    const user = await User.findOne({role: "ADMIN"});  // testing purposes
+    const user = await User.findById(req.user.id);
+    // const user = await User.findOne({role: "ADMIN"});  // testing purposes
     if (user.role !== "ADMIN") {
       return res.status(403).json({ message: "You are not authorized to access this resource" });
     }
@@ -244,56 +244,10 @@ export async function getAdminTickets(req, res) {
   }
 }
 
-export async function getTicketDetails(req, res) {
-  try {
-
-    // const user = await User.findById(req.user.id);
-    // const user = await User.findOne({role: "ADMIN"});
-    const user = await User.findOne({role: "ADMIN"});
-    
-    const ticket = await Ticket.findById(req.params.id).populate('userId', 'name email role');
-    if (!ticket) return res.status(404).json({ message: 'Ticket not found' });
-
-    if (user.role !== 'ADMIN' && ticket.userId._id.toString() !== req.user.id) {
-      return res.status(403).json({ message: 'Access denied' });
-    }
-
-    res.json(ticket);
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching ticket', error: error.message });
-  }
-}
-
-export async function getTicketByStatus(req, res) {
-  try {
-    const status = req.params.status.toUpperCase();
-
-    const tickets = await Ticket.find({ status })
-      .sort({ createdAt: -1 }); // descending order
-
-    res.json(tickets);
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching tickets', error: error.message });
-  }
-}
-
-export async function getTicketByPriority(req, res) {
-  try {
-    const priority = req.params.priority.toUpperCase();
-
-    const tickets = await Ticket.find({ priority })
-      .sort({ createdAt: -1 }); // descending order
-
-    res.json(tickets);
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching tickets', error: error.message });
-  }
-}
-
 export async function updateTicket(req, res) {
   try {
-    // const user = await User.findById(req.user.id);
-    const user = await User.findOne({role: "ADMIN"});
+    const user = await User.findById(req.user.id);
+    // const user = await User.findOne({role: "ADMIN"});  // testing purposes
     const ticket = await Ticket.findById(req.params.ticketId);
     if (!ticket) return res.status(404).json({ message: 'Ticket not found' });
 
@@ -355,31 +309,7 @@ export async function updateTicket(req, res) {
   }
 }
 
-export async function deleteTicket(req, res) {
-  try {
-    const user = await User.findById(req.user.id);
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
 
-    const ticket = await Ticket.findById(req.params.ticketId);
-    if (!ticket) {
-      return res.status(404).json({ message: 'Ticket not found' });
-    }
-
-    // Check if user is admin or owns the ticket
-    if (user.role !== 'admin' && ticket.user.toString() !== user._id.toString()) {
-      return res.status(403).json({ message: 'You are not authorized to delete this ticket' });
-    }
-
-    await ticket.deleteOne();
-
-    res.status(200).json({ message: 'Ticket deleted successfully' });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
-  }
-}
 
 export async function deleteUsers(req, res) {
   try {
@@ -401,7 +331,7 @@ export async function deleteUsers(req, res) {
       return res.status(404).json({ message: 'User to delete not found' });
     }
 
-    // Optionally, prevent admin from deleting themselves
+    // prevent admin from deleting themselves
     if (userToDelete._id.toString() === user._id.toString()) {
       return res.status(400).json({ message: 'Admin cannot delete themselves' });
     }
@@ -412,5 +342,29 @@ export async function deleteUsers(req, res) {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
+  }
+}
+
+export async function getCurrentAdmin(req, res) {
+  try {
+    // const user = await User.findOne({ role: "ADMIN" }); // testing purposes
+    const user = await User.findById(req.user.id);
+    
+    if (user.role !== "ADMIN") {
+      return res.status(404).json({ message: "Admin not found" });
+    }
+
+    // Return only necessary profile data
+    const adminProfile = {
+      name: user.name,
+      email: user.email,
+      profileImg: user.profileImg,
+      department: user.department
+    };
+
+    return res.status(200).json(adminProfile);
+  } catch (error) {
+    console.error("Error fetching admin profile:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 }

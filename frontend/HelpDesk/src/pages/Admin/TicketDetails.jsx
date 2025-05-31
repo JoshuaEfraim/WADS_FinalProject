@@ -22,7 +22,7 @@ import {
   Loader2,
 } from "lucide-react"
 
-const API_URL = "http://localhost:3000/api/admin/ticketDetails"
+const API_URL = "http://localhost:3000/api/tickets/ticketDetails"
 const UPDATE_URL = "http://localhost:3000/api/admin/ticket"
 
 const statusOptions = ["AWAITING_APPROVAL", "PENDING", "REJECTED", "PROCESSING", "RESOLVED"]
@@ -164,7 +164,7 @@ export default function TicketDetails() {
   if (!ticket) return null
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8 px-4">
+    <div className="min-h-screen py-8 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-6">
@@ -327,6 +327,33 @@ export default function TicketDetails() {
                       </div>
                     )}
                   </div>
+
+                  {ticket.approvalInfo && (
+                    <>
+                      <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-2">Approved By</label>
+                        <div className="p-3 bg-slate-50 rounded-md">
+                          <div className="flex items-center gap-2">
+                            <User className="w-4 h-4 text-gray-500" />
+                            <span className="text-gray-900">{ticket.approvalInfo.approvedBy}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-2">Approval Date</label>
+                        <div className="p-3 bg-slate-50 rounded-md">
+                          <div className="flex items-center gap-2">
+                            <Calendar className="w-4 h-4 text-gray-500" />
+                            <span className="text-gray-900">
+                              {new Date(ticket.approvalInfo.approvedAt).toLocaleDateString()} at{" "}
+                              {new Date(ticket.approvalInfo.approvedAt).toLocaleTimeString()}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               </CardContent>
             </Card>

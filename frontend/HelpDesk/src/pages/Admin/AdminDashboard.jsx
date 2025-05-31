@@ -259,17 +259,6 @@ const AdminDashboard = () => {
                 <CardTitle className="text-2xl font-bold text-primary-500">Recent Tickets</CardTitle>
                 <p className="text-sm text-gray-600 mt-1">View the latest 5 tickets</p>
               </div>
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" className="text-xs">
-                  Sort
-                </Button>
-                <Button variant="outline" size="sm" className="text-xs">
-                  Filter
-                </Button>
-                <Button variant="outline" size="sm" className="text-xs">
-                  Export
-                </Button>
-              </div>
             </div>
           </CardHeader>
           <CardContent>
