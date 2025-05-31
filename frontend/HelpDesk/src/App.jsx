@@ -9,7 +9,6 @@ import TicketHistory from './pages/Admin/TicketHistory'
 import AdminLayout from './components/AdminLayout'
 
 import TicketReply from "./pages/Admin/TicketReply";
-import TicketReplyPage from './pages/Admin/TicketReplyPage'
 
 const App = () => {
   return (
