@@ -19,7 +19,9 @@ export default function TicketReplyPage() {
     // Fetch the ticket’s main data (subject + description)
     setLoading(true)
     axios
-      .get(`http://localhost:5000/api/tickets/ticketReply/${id}`)
+      .get(`http://localhost:5000/api/tickets/ticketReply/${id}`,{
+        withCredentials:true
+      })
       .then((res) => {
         // backend returns: { ticket: { … }, replies: [ … ] }
         // we only need ticket details here
@@ -100,3 +102,4 @@ export default function TicketReplyPage() {
     </div>
   )
 }
+

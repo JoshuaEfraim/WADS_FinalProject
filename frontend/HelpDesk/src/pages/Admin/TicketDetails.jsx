@@ -23,13 +23,7 @@ import {
 } from "lucide-react"
 import TicketReplyPage from "./TicketReplyPage";
 
-<<<<<<< HEAD
 const API_URL = import.meta.env.VITE_API_URL
-=======
-
-const API_URL = "http://localhost:5000/api/tickets/ticketDetails"
-const UPDATE_URL = "http://localhost:5000/api/admin/ticket"
->>>>>>> TicketReply
 
 const statusOptions = ["AWAITING_APPROVAL", "PENDING", "REJECTED", "PROCESSING", "RESOLVED"]
 const priorityOptions = ["LOW", "MEDIUM", "HIGH"]
@@ -61,21 +55,11 @@ export default function TicketDetails() {
 
   useEffect(() => {
     setLoading(true)
-<<<<<<< HEAD
     fetch(`${API_URL}/api/tickets/ticketDetails/${id}`, {
       credentials: 'include'
     })
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch ticket details")
-=======
-    fetch(`${API_URL}/${id}`, {
-      credentials: 'include'
-    })
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`Failed to fetch ticket details: ${res.status}`)
-        }
->>>>>>> TicketReply
         return res.json()
       })
       .then((data) => {
@@ -105,11 +89,17 @@ export default function TicketDetails() {
     try {
       const res = await fetch(`${API_URL}/api/admin/tickets/${id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        headers: { 
+          "Content-Type": "application/json",
+          'Accept': 'application/json'
+        },
         credentials: "include",
+        body: JSON.stringify(form)
       })
-      if (!res.ok) throw new Error("Update failed")
+      if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(errorData.message || "Update failed")
+      }
       const updated = await res.json()
       setTicket(updated)
       setEdit(false)
@@ -118,7 +108,8 @@ export default function TicketDetails() {
       // Hide success message after 3 seconds
       setTimeout(() => setSuccess(false), 3000)
     } catch (e) {
-      setError("Failed to update ticket")
+      console.error('Error updating ticket:', e)
+      setError(e.message || "Failed to update ticket")
     } finally {
       setSaving(false)
     }
@@ -139,11 +130,7 @@ export default function TicketDetails() {
   }
 
   const formatPriority = (priority) => {
-<<<<<<< HEAD
     if (!priority) return ''
-=======
-    if (!priority) return 'Unknown'
->>>>>>> TicketReply
     return priority.charAt(0) + priority.slice(1).toLowerCase()
   }
 
@@ -272,23 +259,9 @@ export default function TicketDetails() {
                       </div>
                     </div>
                   </div>
-<<<<<<< HEAD
                   <div className="flex gap-2 font-semibold">
                     <Badge className={priorityColors[ticket.priority]}>{formatPriority(ticket.priority)}</Badge>
                     <Badge className={statusColors[ticket.status]}>{formatStatus(ticket.status)}</Badge>
-=======
-                  <div className="flex gap-2">
-                    {ticket.priority && (
-                      <Badge className={priorityColors[ticket.priority] || 'bg-gray-100 text-gray-800 border-gray-200'}>
-                        {formatPriority(ticket.priority)}
-                      </Badge>
-                    )}
-                    {ticket.status && (
-                      <Badge className={statusColors[ticket.status] || 'bg-gray-100 text-gray-800 border-gray-200'}>
-                        {formatStatus(ticket.status)}
-                      </Badge>
-                    )}
->>>>>>> TicketReply
                   </div>
                 </div>
               </CardHeader>

@@ -22,8 +22,7 @@ import TicketForm from './pages/User/ticketform'
 import UserTicketDetails from './pages/User/UserTicketDetails'
 import UserDashboard from './pages/User/UserDashboard'
 import UserLayout from './components/UserLayout'
-
-import TicketReply from "./pages/Admin/TicketReply";
+// import TicketReply from "./pages/Admin/TicketReply"
 
 const App = () => {
   return (
@@ -33,28 +32,11 @@ const App = () => {
           {/* Redirect root to a default route */}
           <Route path="/" element={<Navigate to="/login" replace />} />
 
-<<<<<<< HEAD
           {/* Auth routes */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
-=======
-
-          {/* {Admin Routes} */}
-          {/* <Route element ={<PrivateRoute allowedRoles={["admin"]}/>}> */}
-            {/* <Route path='/' element ={<AdminDashboard/>}/> */}
-            <Route path='/admin' element ={<AdminDashboard/>}/>
-            <Route path='/admin/dashboard' element= {<AdminDashboard/>}/>
-            <Route path='/admin/tickets' element= {<ManageTickets/>}/>
-            <Route path='/admin/tickets/history' element= {<TicketHistory/>}/>
-            <Route path='/admin/tickets/:id' element={<TicketDetails/>}/>
-            <Route path='/admin/users' element= {<ManageUsers/>}/>
-            <Route path='/admin/settings' element= {<Settings/>}/>
-            {/* <Route path="/admin/replyTicket/:id" element={<TicketReply />} /> */}
-            <Route path="/admin/ticket-reply/:id" element={<TicketReply />} />
-          {/* </Route> */}
->>>>>>> TicketReply
           
           {/* Protected Profile Route */}
           <Route 
@@ -81,6 +63,7 @@ const App = () => {
             <Route path="tickets/history" element={<TicketHistory />} />
             <Route path="tickets/:id" element={<TicketDetails />} />
             <Route path="users" element={<ManageUsers />} />
+            
           </Route>
 
           {/* User Routes */}
@@ -94,6 +77,7 @@ const App = () => {
           >
             <Route index element={<UserDashboard />} />
             <Route path="dashboard" element={<UserDashboard />} />
+            <Route path="ticketHistory" element={<TicketHistory/>}/>
             <Route path="tickets/:id" element={<UserTicketDetails />} />
           </Route>
 
