@@ -2,6 +2,7 @@ import express from 'express';
 import {getAdminDashboardData, 
         getAdminTickets,
         getAllUsers,
+        deleteUsers,
         updateTicket,
         getCurrentAdmin } 
 from '../controllers/adminControllers.js';
@@ -9,6 +10,8 @@ from '../controllers/adminControllers.js';
 const router = express.Router();
 
 router.get("/users", getAllUsers)
+
+router.delete("/users/:id", deleteUsers);
 
 router.get("/tickets", getAdminTickets)
 

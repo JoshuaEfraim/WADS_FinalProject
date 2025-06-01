@@ -18,7 +18,7 @@ const App = () => {
     <BrowserRouter>
       <Routes>
         {/* Redirect root to a default route */}
-        <Route path="/" element={<Navigate to="/user" replace />} />
+        <Route path="/" element={<Navigate to="/admin/user" replace />} />
 
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminLayout />}>
@@ -33,7 +33,6 @@ const App = () => {
 
         {/* User Routes */}
           {/* <Route path="userTickets/:id" element={<UserTicketDetails />} /> */}
-
       </Routes>
     </BrowserRouter>
   )

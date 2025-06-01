@@ -22,8 +22,8 @@ import {
   Loader2,
 } from "lucide-react"
 
-const API_URL = "http://localhost:3000/api/tickets/ticketDetails"
-const UPDATE_URL = "http://localhost:3000/api/admin/ticket"
+const API_URL = "http://localhost:5000/api/tickets/ticketDetails"
+const UPDATE_URL = "http://localhost:5000/api/admin/ticket"
 
 const statusOptions = ["AWAITING_APPROVAL", "PENDING", "REJECTED", "PROCESSING", "RESOLVED"]
 const priorityOptions = ["LOW", "MEDIUM", "HIGH"]

@@ -25,8 +25,8 @@ const priorityProgressColors = {
   MEDIUM: "bg-yellow-500",
   LOW: "bg-green-500",
 }
-
-const API_URL = "http://localhost:3000/api/admin/dashboard"
+const URL = import.meta.env.VITE_API_URL
+const API_URL = `${URL}/api/admin/dashboard`
 
 function getPriorityPercent(prioritySummary, totalTickets, level) {
   const found = prioritySummary.find((p) => p._id === level)

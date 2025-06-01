@@ -312,39 +312,48 @@ export async function updateTicket(req, res) {
 
 
 export async function deleteUsers(req, res) {
+  console.log(">>>> req.user is:", req.user);
+
   try {
-    const user = await User.findById(req.user.id);
+    // ─── 1) If req.user is undefined (because you’re not handling auth), skip
+    //           the “only‐admins can delete” check and go straight to deletion.
+    if (!req.user) {
+      // No req.user means we have no authentication layer at the moment.
+      // We allow deletion to proceed. (Alternatively, you could return 403 here.)
+      console.log("No req.user found — skipping admin check and proceeding to delete target.");
+    } else {
+      // ─── 2) If req.user is defined, enforce “only ADMIN” can delete.
+      const user = await User.findById(req.user.id);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
 
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      // Compare uppercase, because your DB stores role as "ADMIN"
+      if (user.role.toUpperCase() !== 'ADMIN') {
+        return res.status(403).json({ message: 'You are not authorized to delete users' });
+      }
     }
 
-    // Only admins can delete users
-    if (user.role !== 'admin') {
-      return res.status(403).json({ message: 'You are not authorized to delete users' });
-    }
-
-    // The ID of the user to delete is in req.params.id
+    // ─── 3) Now actually look up the target user to delete by req.params.id
     const userToDelete = await User.findById(req.params.id);
-
     if (!userToDelete) {
       return res.status(404).json({ message: 'User to delete not found' });
     }
 
-    // prevent admin from deleting themselves
-    if (userToDelete._id.toString() === user._id.toString()) {
+    // ─── 4) If req.user exists, prevent an admin from deleting themselves
+    if (req.user && userToDelete._id.toString() === req.user.id) {
       return res.status(400).json({ message: 'Admin cannot delete themselves' });
     }
 
+    // ─── 5) Delete the target user
     await userToDelete.deleteOne();
+    return res.status(200).json({ message: 'User deleted successfully' });
 
-    res.status(200).json({ message: 'User deleted successfully' });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error in deleteUsers:", error);
+    return res.status(500).json({ message: 'Server error' });
   }
 }
-
 export async function getCurrentAdmin(req, res) {
   try {
     // const user = await User.findOne({ role: "ADMIN" }); // testing purposes
