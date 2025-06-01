@@ -4,6 +4,68 @@ import User from '../models/user.js';
 import approvedTicket from '../models/approvedTicket.js';
 import { sendEmail } from '../utils/sendemail.js';
 
+/**
+ * POST /api/tickets
+ * Create a new support ticket
+ */
+export const createTicket = async (req, res) => {
+  try {
+    const { subject, description, priority } = req.body;
+    const userId = req.user.id;
+
+    // Validate required fields
+    if (!subject || !description || !priority) {
+      return res.status(400).json({ 
+        message: 'Subject, description, and priority are required fields' 
+      });
+    }
+
+    // Validate priority values
+    const validPriorities = ['LOW', 'MEDIUM', 'HIGH'];
+    if (!validPriorities.includes(priority.toUpperCase())) {
+      return res.status(400).json({ 
+        message: 'Priority must be either LOW, MEDIUM, or HIGH' 
+      });
+    }
+
+    // Create new ticket
+    const ticket = new Ticket({
+      userId,
+      subject,
+      description,
+      priority: priority.toUpperCase(),
+      status: 'AWAITING_APPROVAL', // Default status
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+
+    await ticket.save();
+
+    // Find admins to notify
+    const admins = await User.find({ role: 'ADMIN' });
+    
+    // Send email notifications to admins
+    for (const admin of admins) {
+      try {
+        await sendEmail(
+          admin.email,
+          'New Support Ticket Awaiting Approval',
+          `Hello ${admin.name},\n\nA new support ticket has been created and is awaiting your approval.\n\nTicket Details:\nSubject: ${subject}\nPriority: ${priority}\nTicket ID: ${ticket._id}`
+        );
+      } catch (emailError) {
+        console.error('Failed to send email to admin:', emailError);
+      }
+    }
+
+    res.status(201).json({ 
+      message: 'Ticket created successfully', 
+      ticket 
+    });
+  } catch (err) {
+    console.error('Error in createTicket:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
 
 /**
  * POST /api/tickets/:id/reply
