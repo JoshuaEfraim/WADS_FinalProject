@@ -14,6 +14,7 @@ import ForgotPasswordPage from './pages/Auth/forgotpasswordpage'
 import ResetPasswordPage from './pages/Auth/ResetPasswordPage'
 import ProfileSettings from './components/ProfileSettings'
 import { ToastContainer } from './components/ui/toast'
+import TicketForm from './pages/User/ticketform'
 
 // User Pages
 import UserTicketDetails from './pages/User/UserTicketDetails'
@@ -27,7 +28,7 @@ const App = () => {
         {/* Redirect root to a default route */}
         <Route path="/" element={<Navigate to="/login" replace />} />
 
-        
+        <Route path="/ticketform" element={<TicketForm />} />
         {/* Auth routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
