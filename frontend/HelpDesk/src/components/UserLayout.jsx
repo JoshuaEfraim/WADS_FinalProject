@@ -1,24 +1,31 @@
 import { useState, useEffect } from "react"
-import { Search, Settings, Menu, LayoutDashboard, Ticket, Bell, X, Plus } from "lucide-react"
-import { Outlet, useLocation } from "react-router-dom"
+import { Search, Settings, Menu, LayoutDashboard, Ticket, Bell, X, Plus, LogOut } from "lucide-react"
+import { Outlet, useLocation, Link, useNavigate } from "react-router-dom"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
+import authService from "@/services/auth"
+import { useToast } from "@/components/ui/use-toast"
 
 const UserLayout = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [userProfile, setUserProfile] = useState(null)
   const location = useLocation()
+  const navigate = useNavigate()
+  const { toast } = useToast()
 
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/user/profile')
-        if (!response.ok) throw new Error('Failed to fetch user profile')
-        const data = await response.json()
-        setUserProfile(data)
+        const response = await authService.getCurrentUser()
+        // Extract profile from response
+        if (response.success && response.profile) {
+          setUserProfile(response.profile)
+        } else {
+          console.error('Invalid profile data structure:', response)
+        }
       } catch (error) {
         console.error('Error fetching user profile:', error)
       }
@@ -27,11 +34,25 @@ const UserLayout = ({ children }) => {
     fetchUserProfile()
   }, [])
 
+  const handleLogout = async () => {
+    try {
+      await authService.logout()
+      navigate('/login')
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Failed to logout"
+      })
+    }
+  }
+
   const navItems = [
     { icon: LayoutDashboard, label: "Dashboard", href: "/user/dashboard" },
     { icon: Plus, label: "Create Ticket", href: "/user/create-ticket" },
     { icon: Ticket, label: "Ticket History", href: "/user/tickets" },
-    { icon: Settings, label: "Settings", href: "/user/settings" },
+    { icon: Settings, label: "Settings", href: "/user/profile" },
+    { icon: LogOut, label: "Logout", onClick: handleLogout },
   ]
 
   const isActive = (path) => {
@@ -89,22 +110,37 @@ const UserLayout = ({ children }) => {
         {/* Navigation Items */}
         <nav className="flex-1 px-2 py-4 space-y-1">
           {navItems.map((item) => (
-            <a
-              key={item.label}
-              href={item.href}
-              className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
-                isActive(item.href)
-                  ? "bg-primary-500 text-white shadow-md"
-                  : "hover:bg-primary-500 hover:text-white"
-              }`}
-            >
-              <item.icon className={`h-5 w-5 mr-3 ${isActive(item.href) ? "text-white" : ""}`} />
-              {isSidebarOpen && (
-                <span className={isActive(item.href) ? "opacity-100" : "opacity-90"}>
-                  {item.label}
-                </span>
-              )}
-            </a>
+            item.onClick ? (
+              <button
+                key={item.label}
+                onClick={item.onClick}
+                className="w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 hover:bg-primary-500 hover:text-white"
+              >
+                <item.icon className="h-5 w-5 mr-3" />
+                {isSidebarOpen && (
+                  <span className="opacity-90">
+                    {item.label}
+                  </span>
+                )}
+              </button>
+            ) : (
+              <Link
+                key={item.label}
+                to={item.href}
+                className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                  isActive(item.href)
+                    ? "bg-primary-500 text-white shadow-md"
+                    : "hover:bg-primary-500 hover:text-white"
+                }`}
+              >
+                <item.icon className={`h-5 w-5 mr-3 ${isActive(item.href) ? "text-white" : ""}`} />
+                {isSidebarOpen && (
+                  <span className={isActive(item.href) ? "opacity-100" : "opacity-90"}>
+                    {item.label}
+                  </span>
+                )}
+              </Link>
+            )
           ))}
         </nav>
       </aside>
@@ -144,9 +180,9 @@ const UserLayout = ({ children }) => {
           {/* Mobile Navigation */}
           <nav className="flex-1 px-2 py-4 space-y-1">
             {navItems.map((item) => (
-              <a
+              <Link
                 key={item.label}
-                href={item.href}
+                to={item.href}
                 className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
                   isActive(item.href)
                     ? "bg-primary-500 text-white shadow-md"
@@ -158,7 +194,7 @@ const UserLayout = ({ children }) => {
                 <span className={isActive(item.href) ? "opacity-100" : "opacity-90"}>
                   {item.label}
                 </span>
-              </a>
+              </Link>
             ))}
           </nav>
         </div>

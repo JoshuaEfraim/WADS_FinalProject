@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3000/service/user'; // Replace with your backend URL
+const API_URL = 'http://localhost:5000/service/user'; // Replace with your backend URL
 
 
 //signin
@@ -14,6 +14,7 @@ const authService = {
       const response = await axios.post(`${API_URL}/signin`, { email, password }, {
         withCredentials: true
       });
+      console.log('Login response:', response.data);
       return response.data;
     } catch (/** @type {any} */ error) {
       console.error('Auth service error:', error.response?.data);
@@ -110,17 +111,32 @@ const authService = {
 
   logout: async () => {
     try {
-      await axios.post(`${API_URL}/logout`, {}, {
+      const response = await axios.get(`${API_URL}/logout`, {
         withCredentials: true
       });
+      
+      if (response.data.success) {
+        // You might want to clear any local state/storage here if needed
+        return response.data;
+      } else {
+        throw new Error(response.data.message || 'Logout failed');
+      }
     } catch (error) {
       console.error('Logout error:', error);
+      throw error.response?.data || { message: 'Error during logout' };
     }
   },
 
-  googleLogin: () => {
-    // Redirect to Google auth - backend handles all redirects
-    window.location.href = `${API_URL}/auth/google`;
+  googleLogin: async () => {
+    try {
+      // Redirect to Google auth with our callback URL and intended redirect
+      const callbackUrl = `${window.location.origin}/auth/callback`;
+      // Don't set redirect in state since AuthCallback will handle role-based redirection
+      window.location.href = `${API_URL}/auth/google?redirect_uri=${encodeURIComponent(callbackUrl)}`;
+    } catch (error) {
+      console.error('Google login error:', error);
+      throw error;
+    }
   },
 
   /**

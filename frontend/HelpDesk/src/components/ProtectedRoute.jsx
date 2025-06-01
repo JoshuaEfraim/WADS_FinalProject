@@ -6,17 +6,25 @@ export default function ProtectedRoute({ children, allowedRoles }) {
   const location = useLocation();
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="flex items-center justify-center min-h-screen">
+      <div className="text-lg">Loading...</div>
+    </div>;
   }
 
-  if (!user) {
+  // Debug log to check user data
+  console.log('Protected Route - User:', user);
+  console.log('Protected Route - Allowed Roles:', allowedRoles);
+
+  if (!user || !user.role) {
     // Redirect to login if not authenticated
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     // Redirect to appropriate dashboard based on role
-    return <Navigate to={user.role === 'ADMIN' ? '/admin/dashboard' : '/user/dashboard'} replace />;
+    const redirectPath = user.role === 'ADMIN' ? '/admin/dashboard' : '/user/dashboard';
+    console.log('Redirecting to:', redirectPath);
+    return <Navigate to={redirectPath} replace />;
   }
 
   return children;

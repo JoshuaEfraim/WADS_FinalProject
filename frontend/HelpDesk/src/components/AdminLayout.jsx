@@ -1,26 +1,31 @@
 import { useState, useEffect } from "react"
-import { Search, Settings, Menu, LayoutDashboard, Ticket, Users, Bell, X } from "lucide-react"
-import { Outlet, useLocation, Link } from "react-router-dom"
+import { Search, Settings, Menu, LayoutDashboard, Ticket, Users, Bell, X, LogOut } from "lucide-react"
+import { Outlet, useLocation, Link, useNavigate } from "react-router-dom"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
+import authService from "@/services/auth"
+import { useToast } from "@/components/ui/use-toast"
 
 const AdminLayout = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [adminProfile, setAdminProfile] = useState(null)
   const location = useLocation()
+  const navigate = useNavigate()
+  const { toast } = useToast()
 
   useEffect(() => {
     const fetchAdminProfile = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/admin/profile', {
-          credentials: 'include'
-        }) 
-        if (!response.ok) throw new Error('Failed to fetch admin profile')
-        const data = await response.json()
-        setAdminProfile(data)
+        const response = await authService.getCurrentUser()
+        // Extract profile from response
+        if (response.success && response.profile) {
+          setAdminProfile(response.profile)
+        } else {
+          console.error('Invalid profile data structure:', response)
+        }
       } catch (error) {
         console.error('Error fetching admin profile:', error)
       }
@@ -29,11 +34,25 @@ const AdminLayout = ({ children }) => {
     fetchAdminProfile()
   }, [])
 
+  const handleLogout = async () => {
+    try {
+      await authService.logout()
+      navigate('/login')
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Failed to logout"
+      })
+    }
+  }
+
   const navItems = [
     { icon: LayoutDashboard, label: "Dashboard", href: "/admin/dashboard" },
     { icon: Ticket, label: "Tickets", href: "/admin/tickets" },
     { icon: Users, label: "Users", href: "/admin/users" },
-    { icon: Settings, label: "Settings", href: "/profile" },
+    { icon: Settings, label: "Settings", href: "/admin/profile" },
+    { icon: LogOut, label: "Logout", onClick: handleLogout },
   ]
 
   const isActive = (path) => {
@@ -91,22 +110,37 @@ const AdminLayout = ({ children }) => {
         {/* Navigation Items */}
         <nav className="flex-1 px-2 py-4 space-y-1">
           {navItems.map((item) => (
-            <Link
-              key={item.label}
-              to={item.href}
-              className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-300 ease-in-out transform hover:scale-105 ${
-                isActive(item.href)
-                  ? "bg-primary-500 text-white shadow-md"
-                  : "hover:bg-primary-500 hover:text-white"
-              }`}
-            >
-              <item.icon className={`h-5 w-5 mr-3 transition-transform duration-300 ${isActive(item.href) ? "text-white scale-110" : ""}`} />
-              {isSidebarOpen && (
-                <span className={`transition-opacity duration-300 ${isActive(item.href) ? "opacity-100" : "opacity-90"}`}>
-                  {item.label}
-                </span>
-              )}
-            </Link>
+            item.onClick ? (
+              <button
+                key={item.label}
+                onClick={item.onClick}
+                className="w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-300 ease-in-out transform hover:scale-105 hover:bg-primary-500 hover:text-white"
+              >
+                <item.icon className="h-5 w-5 mr-3 transition-transform duration-300" />
+                {isSidebarOpen && (
+                  <span className="transition-opacity duration-300 opacity-90">
+                    {item.label}
+                  </span>
+                )}
+              </button>
+            ) : (
+              <Link
+                key={item.label}
+                to={item.href}
+                className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-300 ease-in-out transform hover:scale-105 ${
+                  isActive(item.href)
+                    ? "bg-primary-500 text-white shadow-md"
+                    : "hover:bg-primary-500 hover:text-white"
+                }`}
+              >
+                <item.icon className={`h-5 w-5 mr-3 transition-transform duration-300 ${isActive(item.href) ? "text-white scale-110" : ""}`} />
+                {isSidebarOpen && (
+                  <span className={`transition-opacity duration-300 ${isActive(item.href) ? "opacity-100" : "opacity-90"}`}>
+                    {item.label}
+                  </span>
+                )}
+              </Link>
+            )
           ))}
         </nav>
       </aside>

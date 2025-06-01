@@ -1,15 +1,4 @@
-<<<<<<< HEAD
-import React from 'react'
 
-const TicketHistory = () => {
-  return (
-    <div>TicketHistory</div>
-  )
-}
-
-export default TicketHistory
-=======
-"use client"
 
 import React, { useState, useEffect } from "react"
 import {
@@ -364,4 +353,3 @@ export default function TicketHistory() {
     </div>
   )
 }
->>>>>>> TicketReply

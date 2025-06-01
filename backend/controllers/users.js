@@ -510,4 +510,26 @@ export async function getUserTickets(req, res) {
     }
 }
 
+// Logout user
+export const logout = async (req, res) => {
+    try {
+        // Clear the refresh token cookie
+        res.clearCookie('refreshtoken', {
+            path: '/',
+            httpOnly: true
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "Logged out successfully"
+        });
+    } catch (error) {
+        console.error('Logout error:', error);
+        return res.status(500).json({
+            success: false,
+            message: "Error logging out"
+        });
+    }
+};
+
 export default router;

@@ -11,7 +11,13 @@ export function AuthProvider({ children }) {
     const fetchUser = async () => {
       try {
         const response = await authService.getCurrentUser();
-        setUser(response.profile);
+        console.log('Auth response:', response);
+        // Extract profile from response
+        if (response.success && response.profile) {
+          setUser(response.profile);
+        } else {
+          setUser(null);
+        }
       } catch (error) {
         console.error('Auth check failed:', error);
         setUser(null);

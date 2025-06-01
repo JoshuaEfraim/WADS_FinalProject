@@ -3,6 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Ticket, CheckCircle, Filter, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useNavigate, useSearchParams } from "react-router-dom"
+import { useToast } from "@/components/ui/use-toast"
 
 const priorityColors = {
   HIGH: "bg-red-100 text-red-700 border-red-200",
@@ -19,6 +20,7 @@ const statusColors = {
 }
 
 const UserDashboard = () => {
+  const { toast } = useToast()
   const [stats, setStats] = useState({
     totalTickets: 0,
     resolvedTickets: 0,
@@ -44,25 +46,35 @@ const UserDashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${API_URL}/service/user/dashboard`) 
-        if (!response.ok) throw new Error('Failed to fetch dashboard data')
-        const data = await response.json()
+        const response = await fetch(`${API_URL}/service/user/dashboard`, {
+          credentials: 'include'
+        });
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || 'Failed to fetch dashboard data');
+        }
+        const data = await response.json();
         
         setStats({
           totalTickets: data.totalTickets || 0,
           resolvedTickets: data.totalResolved || 0,
           processingTickets: data.totalProcessing || 0
-        })
-        setTickets(data.tickets || [])
+        });
+        setTickets(data.tickets || []);
       } catch (error) {
-        console.error('Error fetching dashboard data:', error)
+        console.error('Error fetching dashboard data:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: error.message || "Failed to fetch dashboard data"
+        });
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchData()
-  }, [])
+    fetchData();
+  }, []);
 
   const filteredTickets = tickets.filter(ticket => {
     const statusMatch = selectedStatus === "ALL" || ticket.status === selectedStatus

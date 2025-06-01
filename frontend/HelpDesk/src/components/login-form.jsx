@@ -61,17 +61,30 @@ export function LoginForm({ className = "" }) {
         // Show success toast
         toast({
           title: "Success",
-          description: "Sign in successful!"
+          description: response.message || "Sign in successful!"
         });
 
-        // Get user profile to check role
-        const userProfile = await authService.getCurrentUser();
-        
-        // Redirect based on role
-        if (userProfile.profile.role === 'ADMIN') {
-          navigate('/admin/dashboard');
+        // The backend already sends user data in the login response
+        if (response.user && response.user.role) {
+          // Redirect based on role from login response
+          if (response.user.role === 'ADMIN') {
+            navigate('/admin/dashboard', { replace: true });
+          } else {
+            navigate('/user/dashboard', { replace: true });
+          }
         } else {
-          navigate('/user/dashboard');
+          // Fallback to getting user profile if role not in login response
+          try {
+            const userProfile = await authService.getCurrentUser();
+            if (userProfile.profile.role === 'ADMIN') {
+              navigate('/admin/dashboard', { replace: true });
+            } else {
+              navigate('/user/dashboard', { replace: true });
+            }
+          } catch (error) {
+            console.error('Error getting user profile:', error);
+            setFormError("Error determining user role");
+          }
         }
       }
     } catch (error) {

@@ -184,21 +184,7 @@ export const getTicketReply = async (req, res) => {
 // 3) Return only the ticket’s core fields (no replies)
 //     This is used by your “Details” tab (GET /api/tickets/:id).
 // ———————————
-export const getTicketDetails = async (req, res) => {
-  try {
-    const ticket = await Ticket
-      .findById(req.params.id)
-      .populate('userId', 'name email');
 
-    if (!ticket) {
-      return res.status(404).json({ message: 'Ticket not found' });
-    }
-    return res.json(ticket);
-  } catch (err) {
-    console.error('❌ Error in getTicketDetails:', err);
-    return res.status(500).json({ error: err.message });
-  }
-};
 
 // ———————————
 // 4) GET all resolved tickets (admin view)

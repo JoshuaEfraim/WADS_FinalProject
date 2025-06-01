@@ -1,7 +1,8 @@
-import React from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import React, { useEffect } from 'react'
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import ProtectedRoute from './components/ProtectedRoute'
-import { AuthProvider } from './contexts/AuthContext'
+import { AuthProvider, useAuth } from './contexts/AuthContext'
+import authService from '@/services/auth'
 
 // Admin Pages
 import AdminDashboard from './pages/Admin/AdminDashboard'
@@ -25,6 +26,47 @@ import UserLayout from './components/UserLayout'
 
 import TicketReply from "./pages/Admin/TicketReply";
 
+// Auth callback component
+function AuthCallback() {
+  const navigate = useNavigate();
+  const { user, loading } = useAuth();
+
+  useEffect(() => {
+    const handleRedirect = async () => {
+      if (!loading) {
+        console.log('AuthCallback - User:', user);
+        if (user && user.role) {
+          // Redirect based on role
+          const redirectPath = user.role === 'ADMIN' ? '/admin/dashboard' : '/user/dashboard';
+          console.log('Redirecting to:', redirectPath);
+          navigate(redirectPath, { replace: true });
+        } else {
+          // If no user or role, try to get current user
+          try {
+            const response = await authService.getCurrentUser();
+            if (response.success && response.profile && response.profile.role) {
+              const redirectPath = response.profile.role === 'ADMIN' ? '/admin/dashboard' : '/user/dashboard';
+              navigate(redirectPath, { replace: true });
+            } else {
+              console.log('No user or role, redirecting to login');
+              navigate('/login', { replace: true });
+            }
+          } catch (error) {
+            console.error('Error getting user profile:', error);
+            navigate('/login', { replace: true });
+          }
+        }
+      }
+    };
+
+    handleRedirect();
+  }, [user, loading, navigate]);
+
+  return <div className="flex items-center justify-center min-h-screen">
+    <div className="text-lg">Loading...</div>
+  </div>;
+}
+
 const App = () => {
   return (
     <AuthProvider>
@@ -38,16 +80,8 @@ const App = () => {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
-          
-          {/* Protected Profile Route */}
-          <Route 
-            path="/profile" 
-            element={
-              <ProtectedRoute allowedRoles={['ADMIN', 'USER']}>
-                <ProfileSettings />
-              </ProtectedRoute>
-            } 
-          />
+          <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/logout" element={<Navigate to="/login" replace />} />
           
           {/* Admin Routes */}
           <Route 
@@ -64,6 +98,7 @@ const App = () => {
             <Route path="tickets/history" element={<TicketHistory />} />
             <Route path="tickets/:id" element={<TicketDetails />} />
             <Route path="users" element={<ManageUsers />} />
+            <Route path="profile" element={<ProfileSettings />} />
           </Route>
 
           {/* User Routes */}
@@ -78,6 +113,7 @@ const App = () => {
             <Route index element={<UserDashboard />} />
             <Route path="dashboard" element={<UserDashboard />} />
             <Route path="tickets/:id" element={<UserTicketDetails />} />
+            <Route path="profile" element={<ProfileSettings />} />
           </Route>
 
           {/* Ticket Form Route */}
