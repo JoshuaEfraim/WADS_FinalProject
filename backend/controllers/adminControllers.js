@@ -372,7 +372,7 @@ export async function deleteUsers(req, res) {
     }
 
     // Only admins can delete users
-    if (user.role !== 'admin') {
+    if (user.role !== 'ADMIN') {
       return res.status(403).json({ message: 'You are not authorized to delete users' });
     }
 
