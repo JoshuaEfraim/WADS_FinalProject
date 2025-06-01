@@ -103,28 +103,28 @@ export default function ReplyInput({ ticketId, onReplySent }) {
       setSending(true);
       setError(null);
 
-      // POST exactly { message: "..."} to match your backend controller
+      // POST with replyMessage to match backend expectation
       const res = await axios.post(
-        `http://localhost:5000/api/tickets/reply/${ticketId}`,
-        { message: message.trim() },
+        `http://localhost:5000/api/tickets/ticketReply/${ticketId}`,
+        { replyMessage: message.trim() },
         {
           headers: { "Content-Type": "application/json" },
           withCredentials: true,
         }
       );
 
-      // If backend returns 201 Created, clear the textarea and notify parent
+      // If backend returns 200 or 201, clear the textarea and notify parent
       if (res.status === 200 || res.status === 201) {
         setMessage("");
         if (onReplySent) {
-          onReplySent(); // increment refreshKey in parent
+          onReplySent();
         }
       } else {
         throw new Error("Failed to send reply");
       }
     } catch (err) {
       console.error("Reply error:", err);
-      setError("Failed to send reply. Please try again.");
+      setError(err.response?.data?.message || "Failed to send reply. Please try again.");
     } finally {
       setSending(false);
     }

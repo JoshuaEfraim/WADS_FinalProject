@@ -1,6 +1,7 @@
 import { useState } from "react"
 import AllTickets from "@/components/AllTickets"
 
+import TicketHistory from "./TicketHistory"
 const ManageTickets = () => {
   const [activeTab, setActiveTab] = useState("all")
 

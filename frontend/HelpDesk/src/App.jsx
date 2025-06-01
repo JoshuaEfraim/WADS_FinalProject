@@ -80,6 +80,16 @@ const App = () => {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+          
+          {/* Protected Profile Route */}
+          <Route 
+            path="/profile" 
+            element={
+              <ProtectedRoute allowedRoles={['ADMIN', 'USER']}>
+                <ProfileSettings />
+              </ProtectedRoute>
+            } 
+          />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/logout" element={<Navigate to="/login" replace />} />
           

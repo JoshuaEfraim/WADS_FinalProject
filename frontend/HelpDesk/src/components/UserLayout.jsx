@@ -49,8 +49,8 @@ const UserLayout = ({ children }) => {
 
   const navItems = [
     { icon: LayoutDashboard, label: "Dashboard", href: "/user/dashboard" },
-    { icon: Plus, label: "Create Ticket", href: "/user/create-ticket" },
-    { icon: Ticket, label: "Ticket History", href: "/user/tickets" },
+    { icon: Plus, label: "Create Ticket", href: "/ticketform" },
+    { icon: Ticket, label: "Ticket History", href: "/user/ticketHistory" },
     { icon: Settings, label: "Settings", href: "/user/profile" },
     { icon: LogOut, label: "Logout", onClick: handleLogout },
   ]

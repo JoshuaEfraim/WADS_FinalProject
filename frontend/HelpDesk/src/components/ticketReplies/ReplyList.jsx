@@ -70,7 +70,9 @@ export default function ReplyList({ ticketId, refreshKey }) {
         // **Must** call /api/tickets/ticketReply/:ticketId
         // This endpoint returns { ticket: {...}, replies: [ ... ] }
         const res = await axios.get(
-          `http://localhost:5000/api/tickets/ticketReply/${ticketId}`
+          `http://localhost:5000/api/tickets/ticketReply/${ticketId}`,{
+            withCredentials:true
+          }
         );
         setReplies(res.data.replies || []);
       } catch (err) {

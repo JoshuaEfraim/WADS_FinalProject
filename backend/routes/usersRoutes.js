@@ -18,6 +18,7 @@ router.post("/reset-password", resetPassword)
 router.put("/update/:id", auth, upload.single('profileImage'), updateUser)
 router.get("/profile", auth, getProfile)
 router.get("/dashboard", auth, getUserTickets)
+router.get("/dashboard", auth,getUserTickets)
 
 // Google OAuth routes
 router.get('/auth/google',

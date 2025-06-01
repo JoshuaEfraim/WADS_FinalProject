@@ -93,9 +93,10 @@ export const replyToTicket = async (req, res) => {
       return res.status(404).json({ message: 'Sender not found' });
     }
 
+    // Save the reply (use senderId instead of userId)
     const reply = new TicketReply({
       ticketId: ticket._id,
-      userId: senderId,
+      senderId: senderId,
       message: replyMessage,
     });
     await reply.save();
@@ -180,42 +181,49 @@ export const getTicketReply = async (req, res) => {
   }
 };
 
-// ———————————
-// 3) Return only the ticket’s core fields (no replies)
-//     This is used by your “Details” tab (GET /api/tickets/:id).
-// ———————————
-
 
 // ———————————
-// 4) GET all resolved tickets (admin view)
-// ———————————
-export const getAllResolvedTickets = async (req, res) => {
-  try {
-    const tickets = await Ticket
-      .find({ status: 'RESOLVED' })
-      .populate('userId', 'name email')
-      .sort({ updatedAt: -1 });
-
-    return res.json({ tickets });
-  } catch (err) {
-    console.error('❌ Error in getAllResolvedTickets:', err);
-    return res.status(500).json({ error: err.message });
-  }
-};
-
-// ———————————
-// 5) GET ticket history for a specific user
+// 5) GET ticket history for a specific user (or all tickets if admin) WITH PAGINATION
 // ———————————
 export const getUserTicketHistory = async (req, res) => {
   try {
-    const tickets = await Ticket
-      .find({
-        userId: req.params.userId,
-        status: 'RESOLVED',
-      })
-      .sort({ updatedAt: -1 });
+    // Get the authenticated user
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
 
-    return res.json({ tickets });
+    // Pagination parameters
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    // Build query: “RESOLVED” tickets only; if not ADMIN, filter by userId
+    let query = { status: 'RESOLVED' };
+    if (user.role !== 'ADMIN') {
+      query.userId = user._id;
+    }
+
+    // Count total documents for this query
+    const totalTickets = await Ticket.countDocuments(query);
+    const totalPages = Math.ceil(totalTickets / limit);
+
+    // Fetch the slice
+    const tickets = await Ticket
+      .find(query)
+      .populate('userId', 'name email')
+      .sort({ updatedAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    return res.json({
+      tickets,
+      currentPage: page,
+      totalPages,
+      totalTickets,
+      hasNextPage: page < totalPages,
+      hasPrevPage: page > 1
+    });
   } catch (err) {
     console.error('❌ Error in getUserTicketHistory:', err);
     return res.status(500).json({ error: err.message });
@@ -249,6 +257,10 @@ export async function deleteTicket(req, res) {
   }
 }
 
+
+// ———————————
+// GET ticket details (no change from before)
+// ———————————
 export async function getTicketDetails(req, res) {
   try {
 

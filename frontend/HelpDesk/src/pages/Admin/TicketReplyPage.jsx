@@ -19,7 +19,9 @@ export default function TicketReplyPage() {
     // Fetch the ticket’s main data (subject + description)
     setLoading(true)
     axios
-      .get(`http://localhost:5000/api/tickets/ticketReply/${id}`)
+      .get(`http://localhost:5000/api/tickets/ticketReply/${id}`,{
+        withCredentials:true
+      })
       .then((res) => {
         // backend returns: { ticket: { … }, replies: [ … ] }
         // we only need ticket details here
@@ -73,11 +75,6 @@ export default function TicketReplyPage() {
         <h2 className="text-xl font-semibold text-gray-800">Replies</h2>
         <Card className="border bg-white shadow-sm">
           <CardContent className="p-4 space-y-4">
-            {/*
-              <ReplyList> is responsible for fetching / displaying all replies.
-              We pass it the ticketId and a changing refreshKey so it re‐loads
-              whenever handleRefresh() increments refreshKey.
-            */}
             <ReplyList ticketId={id} refreshKey={refreshKey} />
           </CardContent>
         </Card>
@@ -88,11 +85,6 @@ export default function TicketReplyPage() {
         <h2 className="text-lg font-semibold text-gray-800">Post a Reply</h2>
         <Card className="border bg-white shadow-sm">
           <CardContent className="p-4">
-            {/*
-              <ReplyInput> holds the textarea + “Send” button.
-              We pass it `ticketId` and an onReplySent callback so that,
-              once a reply is successfully POSTed, it calls handleRefresh().
-            */}
             <ReplyInput ticketId={id} onReplySent={handleRefresh} />
           </CardContent>
         </Card>
@@ -100,3 +92,4 @@ export default function TicketReplyPage() {
     </div>
   )
 }
+

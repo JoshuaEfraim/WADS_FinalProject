@@ -17,14 +17,20 @@ export default function TicketReply() {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState(null);
 
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
   useEffect(() => {
     const fetchReplies = async () => {
       setLoading(true);
       try {
-        // Fetch ticket & its replies
         const response = await axios.get(
-          `http://localhost:5000/api/tickets/ticketReply/${id}`,
-          { withCredentials: true }
+          `${API_URL}/api/tickets/ticketReply/${id}`,
+          {
+            withCredentials: true,
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          }
         );
         setTicket(response.data.ticket);
         setReplies(response.data.replies);
@@ -44,11 +50,15 @@ export default function TicketReply() {
     setError(null);
 
     try {
-      // POST { message } to /reply/:id
       await axios.post(
-        `http://localhost:5000/api/tickets/reply/${id}`,
-        { message: message.trim() },
-        { withCredentials: true }
+        `${API_URL}/api/tickets/ticketReply/${id}`,
+        { replyMessage: message.trim() },
+        {
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
       );
 
       // Clear input
@@ -56,13 +66,18 @@ export default function TicketReply() {
 
       // Re-fetch updated replies
       const res = await axios.get(
-        `http://localhost:5000/api/tickets/ticketReply/${id}`,
-        { withCredentials: true }
+        `${API_URL}/api/tickets/ticketReply/${id}`,
+        {
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
       );
       setReplies(res.data.replies);
     } catch (err) {
       console.error("❌ Failed to send reply:", err);
-      setError("Failed to send reply. Please try again.");
+      setError(err.response?.data?.message || "Failed to send reply. Please try again.");
     } finally {
       setSending(false);
     }
