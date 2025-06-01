@@ -87,6 +87,11 @@ export const replyToTicket = async (req, res) => {
       return res.status(404).json({ message: 'Ticket not found' });
     }
 
+    // Check if ticket is resolved
+    if (ticket.status === 'RESOLVED') {
+      return res.status(403).json({ message: 'Cannot reply to a resolved ticket' });
+    }
+
     console.log('senderId:', senderId);
     const sender = await User.findById(senderId);
     if (!sender) {
@@ -198,7 +203,7 @@ export const getUserTicketHistory = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    // Build query: “RESOLVED” tickets only; if not ADMIN, filter by userId
+    // Build query: "RESOLVED" tickets only; if not ADMIN, filter by userId
     let query = { status: 'RESOLVED' };
     if (user.role !== 'ADMIN') {
       query.userId = user._id;
