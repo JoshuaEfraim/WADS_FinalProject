@@ -125,17 +125,14 @@ const App = () => {
             <Route path="tickets/:id" element={<UserTicketDetails />} />
             <Route path="profile" element={<ProfileSettings />} />
             <Route path="ticketHistory" element={<TicketHistory/>}/>
-          </Route>
-
-          {/* Ticket Form Route */}
-          <Route 
-            path="/ticketform" 
-            element={
+            <Route path="ticketform" element={
               <ProtectedRoute allowedRoles={['USER']}>
                 <TicketForm />
-              </ProtectedRoute>
-            } 
-          />
+              </ProtectedRoute> 
+            }/>
+          </Route>
+
+
         </Routes>
         <ToastContainer />
       </BrowserRouter>

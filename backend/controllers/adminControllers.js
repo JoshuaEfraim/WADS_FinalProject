@@ -248,7 +248,7 @@ export async function getAdminTickets(req, res) {
 export async function updateTicket(req, res) {
   try {
     const user = await User.findById(req.user.id);
-    const ticket = await Ticket.findById(req.params.id);
+    const ticket = await Ticket.findById(req.params.id).populate('userId', 'name email');
     if (!ticket) return res.status(404).json({ message: 'Ticket not found' });
 
     // Access control
