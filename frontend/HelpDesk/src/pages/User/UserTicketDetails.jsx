@@ -41,7 +41,9 @@ const UserTicketDetails = () => {
 
   const fetchTicketDetails = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/tickets/ticketDetails/${id}`)
+      const response = await fetch(`${API_URL}/api/tickets/ticketDetails/${id}`,
+        {credentials:"include"}
+      )
       const data = await response.json()
       setTicket(data)
     } catch (err) {

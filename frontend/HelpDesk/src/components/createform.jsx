@@ -78,7 +78,7 @@ export function CreateForm({ className, ...props }) {
       });
 
       // Navigate to tickets list
-      navigate('/tickets');
+      navigate('/user');
     } catch (error) {
       console.error('Error creating ticket:', error);
       toast({
@@ -149,6 +149,7 @@ export function CreateForm({ className, ...props }) {
               <Button 
                 type="submit" 
                 className="w-full"
+                onSubmit={handleSubmit}
                 disabled={isLoading}
               >
                 {isLoading ? "Creating..." : "Create Ticket"}

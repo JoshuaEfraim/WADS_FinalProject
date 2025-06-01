@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3000/api/tickets'; // Match your backend route
+const API_URL = 'http://localhost:5000/api/tickets'; // Match your backend route
 
 const ticketService = {
   /**
