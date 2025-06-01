@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { Search, Settings, Menu, LayoutDashboard, Ticket, Users, Bell, X } from "lucide-react"
-import { Outlet, useLocation } from "react-router-dom"
+import { Outlet, useLocation, Link } from "react-router-dom"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -15,7 +15,9 @@ const AdminLayout = ({ children }) => {
   useEffect(() => {
     const fetchAdminProfile = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/admin/profile') 
+        const response = await fetch('http://localhost:3000/api/admin/profile', {
+          credentials: 'include'
+        }) 
         if (!response.ok) throw new Error('Failed to fetch admin profile')
         const data = await response.json()
         setAdminProfile(data)
@@ -31,7 +33,7 @@ const AdminLayout = ({ children }) => {
     { icon: LayoutDashboard, label: "Dashboard", href: "/admin/dashboard" },
     { icon: Ticket, label: "Tickets", href: "/admin/tickets" },
     { icon: Users, label: "Users", href: "/admin/users" },
-    { icon: Settings, label: "Settings", href: "/admin/settings" },
+    { icon: Settings, label: "Settings", href: "/profile" },
   ]
 
   const isActive = (path) => {
@@ -65,14 +67,14 @@ const AdminLayout = ({ children }) => {
       >
         {/* Logo */}
         <div className="flex items-center justify-center h-24 w-full">
-          <img src="/logo/siloamLogo.png" alt="Logo" className="h-40 w-40 object-contain" />
+          <img src="/src/assets/logo/siloamLogo-rectangle.png" alt="Logo" className="h-40 w-40 object-contain" />
         </div>
 
         {/* User Profile - Vertical layout */}
         <div className="px-4 pb-4">
           <div className="flex flex-col items-center">
             <Avatar className="h-12 w-12 mb-2">
-              <AvatarImage src={adminProfile?.profileImg || "/avatar-placeholder.png"} alt="User" />
+              <AvatarImage src={adminProfile?.profileImg} alt="User" />
               <AvatarFallback>{getInitials(adminProfile?.name)}</AvatarFallback>
             </Avatar>
             {isSidebarOpen && (
@@ -89,13 +91,13 @@ const AdminLayout = ({ children }) => {
         {/* Navigation Items */}
         <nav className="flex-1 px-2 py-4 space-y-1">
           {navItems.map((item) => (
-            <a
+            <Link
               key={item.label}
-              href={item.href}
+              to={item.href}
               className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-300 ease-in-out transform hover:scale-105 ${
                 isActive(item.href)
                   ? "bg-primary-500 text-white shadow-md"
-                  : "hover:bg-accent hover:text-accent-foreground"
+                  : "hover:bg-primary-500 hover:text-white"
               }`}
             >
               <item.icon className={`h-5 w-5 mr-3 transition-transform duration-300 ${isActive(item.href) ? "text-white scale-110" : ""}`} />
@@ -104,7 +106,7 @@ const AdminLayout = ({ children }) => {
                   {item.label}
                 </span>
               )}
-            </a>
+            </Link>
           ))}
         </nav>
       </aside>
@@ -115,7 +117,7 @@ const AdminLayout = ({ children }) => {
           {/* Mobile Sidebar Header */}
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center">
-              <img src="/logo/siloamLogo.png" alt="Logo" className="h-10 w-10 object-contain mr-2" />
+              <img src="/src/assets/logo/siloamLogo-rectangle.png" alt="Logo" className="h-10 w-10 object-contain mr-2" />
               <span className="font-bold text-secondary-500 text-2xl">My</span> <span className="font-bold text-primary-500 text-2xl">Siloam</span>
             </div>
             <Button variant="ghost" size="icon" className= "hover:bg-primary-500 hover:text-white" onClick={() => setIsMobileMenuOpen(false)}>
@@ -129,7 +131,7 @@ const AdminLayout = ({ children }) => {
           <div className="px-4 py-4">
             <div className="flex items-center">
               <Avatar className="h-10 w-10 mr-3">
-                <AvatarImage src={adminProfile?.profileImg || "/avatar-placeholder.png"} alt="User" />
+                <AvatarImage src={adminProfile?.profileImg} alt="User" />
                 <AvatarFallback>{getInitials(adminProfile?.name)}</AvatarFallback>
               </Avatar>
               <div>
@@ -144,9 +146,9 @@ const AdminLayout = ({ children }) => {
           {/* Mobile Navigation */}
           <nav className="flex-1 px-2 py-4 space-y-1">
             {navItems.map((item) => (
-              <a
+              <Link
                 key={item.label}
-                href={item.href}
+                to={item.href}
                 className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-300 ease-in-out transform hover:scale-105 ${
                   isActive(item.href)
                     ? "bg-primary-500 text-white shadow-md"
@@ -158,7 +160,7 @@ const AdminLayout = ({ children }) => {
                 <span className={`transition-opacity duration-300 ${isActive(item.href) ? "opacity-100" : "opacity-90"}`}>
                   {item.label}
                 </span>
-              </a>
+              </Link>
             ))}
           </nav>
         </div>
@@ -195,7 +197,7 @@ const AdminLayout = ({ children }) => {
                 <Settings className="h-5 w-5" />
               </Button>
               <Avatar className="h-8 w-8">
-                <AvatarImage src={adminProfile?.profileImg || "/avatar-placeholder.png"} alt="User" />
+                <AvatarImage src={adminProfile?.profileImg} alt="User" />
                 <AvatarFallback>{getInitials(adminProfile?.name)}</AvatarFallback>
               </Avatar>
             </div>

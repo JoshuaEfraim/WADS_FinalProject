@@ -66,7 +66,9 @@ const AllTickets = () => {
 
   // Fetch global totals (unfiltered)
   useEffect(() => {
-    fetch(`${API_URL}/api/admin/tickets?page=1&limit=1`)
+    fetch(`${API_URL}/api/admin/tickets?page=1&limit=1` ,{
+      credentials: 'include'
+    })
       .then(res => res.json())
       .then(data => {
         setGlobalTotals({
@@ -89,7 +91,9 @@ const AllTickets = () => {
     })
 
     try {
-      const res = await fetch(`${API_URL}/api/admin/tickets?${params}`)
+      const res = await fetch(`${API_URL}/api/admin/tickets?${params}` ,{
+        credentials: "include"
+      })
       const data = await res.json()
       if (data.success) {
         setTickets(data.tickets)

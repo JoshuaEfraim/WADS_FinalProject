@@ -54,8 +54,13 @@ export default function TicketDetails() {
 
   useEffect(() => {
     setLoading(true)
-    fetch(`${API_URL}/api/tickets/ticketDetails${id}`)
-      .then((res) => res.json())
+    fetch(`${API_URL}/api/tickets/ticketDetails/${id}`, {
+      credentials: 'include'
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch ticket details")
+        return res.json()
+      })
       .then((data) => {
         setTicket(data)
         setForm({ status: data.status, priority: data.priority })
@@ -77,7 +82,7 @@ export default function TicketDetails() {
     setSuccess(false)
     setError(null)
     try {
-      const res = await fetch(`${API_URL}/api/ticket/${id}`, {
+      const res = await fetch(`${API_URL}/api/admin/tickets/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -105,6 +110,7 @@ export default function TicketDetails() {
   }
 
   const formatStatus = (status) => {
+    if (!status) return ''
     return status
       .replace("_", " ")
       .toLowerCase()
@@ -112,10 +118,12 @@ export default function TicketDetails() {
   }
 
   const formatPriority = (priority) => {
+    if (!priority) return ''
     return priority.charAt(0) + priority.slice(1).toLowerCase()
   }
 
   const formatDate = (dateString) => {
+    if (!dateString) return ''
     return new Date(dateString).toLocaleString("en-US", {
       year: "numeric",
       month: "short",

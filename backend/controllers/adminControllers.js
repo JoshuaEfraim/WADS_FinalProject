@@ -248,7 +248,7 @@ export async function updateTicket(req, res) {
   try {
     const user = await User.findById(req.user.id);
     // const user = await User.findOne({role: "ADMIN"});  // testing purposes
-    const ticket = await Ticket.findById(req.params.ticketId);
+    const ticket = await Ticket.findById(req.params.id);
     if (!ticket) return res.status(404).json({ message: 'Ticket not found' });
 
     // Access control

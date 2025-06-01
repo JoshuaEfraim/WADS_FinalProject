@@ -13,9 +13,11 @@ import { useState, useEffect, useRef } from "react"
 import authService from "@/services/auth"
 import { useToast } from "@/components/ui/use-toast"
 import { Loader2 } from "lucide-react"
+import { useAuth } from '@/contexts/AuthContext'
 
 export default function ProfileSettings() {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [isPageLoading, setIsPageLoading] = useState(true);
   const fileInputRef = useRef(null);
@@ -33,42 +35,22 @@ export default function ProfileSettings() {
   const [previewImage, setPreviewImage] = useState(null);
 
   useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        console.log('Fetching user profile...');
-        const userData = await authService.getCurrentUser();
-        console.log('User data received:', userData);
-        
-        // Extract profile data from the nested structure
-        const profileData = userData.profile;
-        
-        setUserId(profileData.id);
-        setFormData(prev => ({
-          ...prev,
-          name: profileData.name || '',
-          email: profileData.email || '',
-          department: profileData.department || '',
-          phoneNumber: profileData.phoneNumber || ''
-        }));
-        
-        // Set profile image if it exists
-        if (profileData.profileImg) {
-          setPreviewImage(profileData.profileImg);
-        }
-      } catch (error) {
-        console.error('Error fetching user profile:', error);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: error.message || "Failed to fetch user profile"
-        });
-      } finally {
-        setIsPageLoading(false);
+    if (user) {
+      setUserId(user.id);
+      setFormData(prev => ({
+        ...prev,
+        name: user.name || '',
+        email: user.email || '',
+        department: user.department || '',
+        phoneNumber: user.phoneNumber || ''
+      }));
+      
+      if (user.profileImg) {
+        setPreviewImage(user.profileImg);
       }
-    };
-
-    fetchUserProfile();
-  }, [toast]);
+      setIsPageLoading(false);
+    }
+  }, [user]);
 
   const handleChange = (e) => {
     const { id, value } = e.target;

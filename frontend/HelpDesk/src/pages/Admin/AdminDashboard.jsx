@@ -42,7 +42,9 @@ const AdminDashboard = () => {
   useEffect(() => {
     setLoading(true)
     setError(null)
-    fetch(`${API_URL}/api/admin/dashboard`)
+    fetch(`${API_URL}/api/admin/dashboard`, {
+      credentials: 'include'
+    })
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch dashboard data")
         return res.json()

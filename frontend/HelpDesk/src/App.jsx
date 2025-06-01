@@ -1,5 +1,7 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import ProtectedRoute from './components/ProtectedRoute'
+import { AuthProvider } from './contexts/AuthContext'
 
 // Admin Pages
 import AdminDashboard from './pages/Admin/AdminDashboard'
@@ -23,37 +25,72 @@ import UserLayout from './components/UserLayout'
 
 const App = () => {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Redirect root to a default route */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Redirect root to a default route */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
 
-        <Route path="/ticketform" element={<TicketForm />} />
-        {/* Auth routes */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
-        <Route path="/profile" element={<ProfileSettings />} />
-        
-        {/* Admin Routes */}
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<AdminDashboard />} />
-          <Route path="dashboard" element={<AdminDashboard />} />
-          <Route path="tickets" element={<ManageTickets />} />
-          <Route path="tickets/history" element={<TicketHistory />} />
-          <Route path="tickets/:id" element={<TicketDetails />} />
-          <Route path="users" element={<ManageUsers />} />
-        </Route>
+          {/* Auth routes */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+          
+          {/* Protected Profile Route */}
+          <Route 
+            path="/profile" 
+            element={
+              <ProtectedRoute allowedRoles={['ADMIN', 'USER']}>
+                <ProfileSettings />
+              </ProtectedRoute>
+            } 
+          />
+          
+          {/* Admin Routes */}
+          <Route 
+            path="/admin" 
+            element={
+              <ProtectedRoute allowedRoles={['ADMIN']}>
+                <AdminLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<AdminDashboard />} />
+            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="tickets" element={<ManageTickets />} />
+            <Route path="tickets/history" element={<TicketHistory />} />
+            <Route path="tickets/:id" element={<TicketDetails />} />
+            <Route path="users" element={<ManageUsers />} />
+          </Route>
 
-        {/* User Routes */}
-        <Route path="/user" element={<UserLayout />}>
-          <Route index element={<UserDashboard />} />
-          <Route path="dashboard" element={<UserDashboard />} />
-          <Route path="tickets/:id" element={<UserTicketDetails />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+          {/* User Routes */}
+          <Route 
+            path="/user" 
+            element={
+              <ProtectedRoute allowedRoles={['USER']}>
+                <UserLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<UserDashboard />} />
+            <Route path="dashboard" element={<UserDashboard />} />
+            <Route path="tickets/:id" element={<UserTicketDetails />} />
+          </Route>
+
+          {/* Ticket Form Route */}
+          <Route 
+            path="/ticketform" 
+            element={
+              <ProtectedRoute allowedRoles={['USER']}>
+                <TicketForm />
+              </ProtectedRoute>
+            } 
+          />
+        </Routes>
+        <ToastContainer />
+      </BrowserRouter>
+    </AuthProvider>
   )
 }
 

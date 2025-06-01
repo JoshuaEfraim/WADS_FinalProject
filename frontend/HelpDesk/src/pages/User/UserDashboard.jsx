@@ -44,7 +44,7 @@ const UserDashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${API_URL}/service/user/dashboard`)
+        const response = await fetch(`${API_URL}/service/user/dashboard`) 
         if (!response.ok) throw new Error('Failed to fetch dashboard data')
         const data = await response.json()
         
