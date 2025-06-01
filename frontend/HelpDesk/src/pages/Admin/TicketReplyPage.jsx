@@ -58,18 +58,6 @@ export default function TicketReplyPage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-8 py-6 px-4">
-      {/* ────────── Ticket Header / Card ────────── */}
-      <Card className="border bg-white shadow-sm">
-        <CardHeader className="px-6 py-4 border-b">
-          <CardTitle className="text-2xl font-semibold text-gray-900">
-            {ticket.subject}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="px-6 py-4 bg-gray-50">
-          <p className="text-gray-700 leading-relaxed">{ticket.description}</p>
-        </CardContent>
-      </Card>
-
       {/* ────────── Replies Section ────────── */}
       <div className="space-y-4">
         <h2 className="text-xl font-semibold text-gray-800">Replies</h2>
