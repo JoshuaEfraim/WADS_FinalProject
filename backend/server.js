@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import { connectDB } from "./config/db.js";
 import adminRoutes from "./routes/adminRoutes.js"
 import ticketRoutes from "./routes/ticketRoutes.js"
+import userRoutes from "./routes/userRoutes.js"
 import cors from "cors";
 
 
@@ -24,6 +25,7 @@ app.use(express.json());
 
 app.use("/api/admin", adminRoutes)
 app.use("/api/tickets", ticketRoutes)
+app.use("/api/user", userRoutes )
 
 app.get("/", (req,res,next) =>{
     res.send("hello world")

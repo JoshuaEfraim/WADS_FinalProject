@@ -26,7 +26,7 @@ const priorityProgressColors = {
   LOW: "bg-green-500",
 }
 
-const API_URL = "http://localhost:3000/api/admin/dashboard"
+const API_URL = import.meta.env.VITE_API_URL
 
 function getPriorityPercent(prioritySummary, totalTickets, level) {
   const found = prioritySummary.find((p) => p._id === level)
@@ -42,7 +42,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     setLoading(true)
     setError(null)
-    fetch(API_URL)
+    fetch(`${API_URL}/api/admin/dashboard`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch dashboard data")
         return res.json()
@@ -436,10 +436,29 @@ const AdminDashboard = () => {
                 <XAxis dataKey="date" tick={{ fontSize: 12, fill: '#6b7280' }} axisLine={false} tickLine={false} />
                 <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: '#6b7280' }} axisLine={false} tickLine={false} />
                 <RechartsTooltip
-                  contentStyle={{ background: 'rgba(30,38,109,0.95)', borderRadius: 8, color: 'white', border: 'none' }}
-                  labelStyle={{ color: 'white', fontWeight: 600 }}
-                  itemStyle={{ color: 'white', fontWeight: 500 }}
+                  contentStyle={{ 
+                    background: 'rgba(30,38,109,0.95)', 
+                    borderRadius: 8, 
+                    color: 'white', 
+                    border: 'none',
+                    padding: '12px',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+                  }}
+                  labelStyle={{ 
+                    color: 'white', 
+                    fontWeight: 600,
+                    fontSize: '14px',
+                    marginBottom: '8px'
+                  }}
+                  itemStyle={{ 
+                    color: 'white', 
+                    fontWeight: 500,
+                    fontSize: '13px',
+                    padding: '4px 0'
+                  }}
                   formatter={(value, name) => [value, statusLabels[name] || name]}
+                  cursor={{ stroke: '#1E266D', strokeWidth: 2, strokeDasharray: '5 5' }}
+                  wrapperStyle={{ outline: 'none' }}
                 />
                 {chartStatuses.map((status) => (
                   <Line

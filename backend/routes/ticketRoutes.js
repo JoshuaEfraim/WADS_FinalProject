@@ -1,8 +1,6 @@
 // backend/routes/ticketRoutes.js
 
 import express from 'express';
-const router = express.Router();
-
 import {
   getAllResolvedTickets,
   getTicketReply,
@@ -11,6 +9,8 @@ import {
   getTicketDetails,
   deleteTicket
 } from '../controllers/ticketController.js';
+
+const router = express.Router();
 
 // GET ticket details + all replies
 router.get('/tickets/:id', getTicketReply);
