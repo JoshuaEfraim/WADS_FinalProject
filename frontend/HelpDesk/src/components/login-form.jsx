@@ -58,12 +58,21 @@ export function LoginForm({ className = "" }) {
           password: ''
         }));
       } else {
-        // Show success toast and navigate
+        // Show success toast
         toast({
           title: "Success",
           description: "Sign in successful!"
         });
-        navigate('/profile');
+
+        // Get user profile to check role
+        const userProfile = await authService.getCurrentUser();
+        
+        // Redirect based on role
+        if (userProfile.profile.role === 'ADMIN') {
+          navigate('/admin/dashboard');
+        } else {
+          navigate('/user/dashboard');
+        }
       }
     } catch (error) {
       console.error('Login error:', error);

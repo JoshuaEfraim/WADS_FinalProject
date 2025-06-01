@@ -17,6 +17,6 @@ router.get("/dashboard", auth, isAdmin, getAdminDashboardData)
 
 router.get("/profile", auth, isAdmin, getCurrentAdmin)
 
-router.patch("/ticket/:ticketId", auth, isAdmin, updateTicket);
+router.patch("/tickets/:id", auth, isAdmin, updateTicket);
 
 export default router;

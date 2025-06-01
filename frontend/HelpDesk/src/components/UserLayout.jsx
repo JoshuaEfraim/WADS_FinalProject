@@ -1,39 +1,37 @@
 import { useState, useEffect } from "react"
-import { Search, Settings, Menu, LayoutDashboard, Ticket, Users, Bell, X } from "lucide-react"
-import { Outlet, useLocation, Link } from "react-router-dom"
+import { Search, Settings, Menu, LayoutDashboard, Ticket, Bell, X, Plus } from "lucide-react"
+import { Outlet, useLocation } from "react-router-dom"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 
-const AdminLayout = ({ children }) => {
+const UserLayout = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [adminProfile, setAdminProfile] = useState(null)
+  const [userProfile, setUserProfile] = useState(null)
   const location = useLocation()
 
   useEffect(() => {
-    const fetchAdminProfile = async () => {
+    const fetchUserProfile = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/admin/profile', {
-          credentials: 'include'
-        }) 
-        if (!response.ok) throw new Error('Failed to fetch admin profile')
+        const response = await fetch('http://localhost:3000/api/user/profile')
+        if (!response.ok) throw new Error('Failed to fetch user profile')
         const data = await response.json()
-        setAdminProfile(data)
+        setUserProfile(data)
       } catch (error) {
-        console.error('Error fetching admin profile:', error)
+        console.error('Error fetching user profile:', error)
       }
     }
 
-    fetchAdminProfile()
+    fetchUserProfile()
   }, [])
 
   const navItems = [
-    { icon: LayoutDashboard, label: "Dashboard", href: "/admin/dashboard" },
-    { icon: Ticket, label: "Tickets", href: "/admin/tickets" },
-    { icon: Users, label: "Users", href: "/admin/users" },
-    { icon: Settings, label: "Settings", href: "/profile" },
+    { icon: LayoutDashboard, label: "Dashboard", href: "/user/dashboard" },
+    { icon: Plus, label: "Create Ticket", href: "/user/create-ticket" },
+    { icon: Ticket, label: "Ticket History", href: "/user/tickets" },
+    { icon: Settings, label: "Settings", href: "/user/settings" },
   ]
 
   const isActive = (path) => {
@@ -42,7 +40,7 @@ const AdminLayout = ({ children }) => {
 
   // Get initials for avatar fallback
   const getInitials = (name) => {
-    if (!name) return 'AD'
+    if (!name) return 'U'
     return name
       .split(' ')
       .map(word => word[0])
@@ -67,20 +65,20 @@ const AdminLayout = ({ children }) => {
       >
         {/* Logo */}
         <div className="flex items-center justify-center h-24 w-full">
-          <img src="/src/assets/logo/siloamLogo-rectangle.png" alt="Logo" className="h-40 w-40 object-contain" />
+          <img src="/logo/siloamLogo.png" alt="Logo" className="h-40 w-40 object-contain" />
         </div>
 
         {/* User Profile - Vertical layout */}
         <div className="px-4 pb-4">
           <div className="flex flex-col items-center">
             <Avatar className="h-12 w-12 mb-2">
-              <AvatarImage src={adminProfile?.profileImg} alt="User" />
-              <AvatarFallback>{getInitials(adminProfile?.name)}</AvatarFallback>
+              <AvatarImage src={userProfile?.profileImg || "/avatar-placeholder.png"} alt="User" />
+              <AvatarFallback>{getInitials(userProfile?.name)}</AvatarFallback>
             </Avatar>
             {isSidebarOpen && (
               <div className="text-center">
-                <h3 className="font-medium text-sm">{adminProfile?.name || 'Loading...'}</h3>
-                <p className="text-xs text-muted-foreground">{adminProfile?.email || 'Loading...'}</p>
+                <h3 className="font-medium text-sm">{userProfile?.name || 'Loading...'}</h3>
+                <p className="text-xs text-muted-foreground">{userProfile?.email || 'Loading...'}</p>
               </div>
             )}
           </div>
@@ -91,22 +89,22 @@ const AdminLayout = ({ children }) => {
         {/* Navigation Items */}
         <nav className="flex-1 px-2 py-4 space-y-1">
           {navItems.map((item) => (
-            <Link
+            <a
               key={item.label}
-              to={item.href}
-              className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-300 ease-in-out transform hover:scale-105 ${
+              href={item.href}
+              className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
                 isActive(item.href)
                   ? "bg-primary-500 text-white shadow-md"
                   : "hover:bg-primary-500 hover:text-white"
               }`}
             >
-              <item.icon className={`h-5 w-5 mr-3 transition-transform duration-300 ${isActive(item.href) ? "text-white scale-110" : ""}`} />
+              <item.icon className={`h-5 w-5 mr-3 ${isActive(item.href) ? "text-white" : ""}`} />
               {isSidebarOpen && (
-                <span className={`transition-opacity duration-300 ${isActive(item.href) ? "opacity-100" : "opacity-90"}`}>
+                <span className={isActive(item.href) ? "opacity-100" : "opacity-90"}>
                   {item.label}
                 </span>
               )}
-            </Link>
+            </a>
           ))}
         </nav>
       </aside>
@@ -117,10 +115,10 @@ const AdminLayout = ({ children }) => {
           {/* Mobile Sidebar Header */}
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center">
-              <img src="/src/assets/logo/siloamLogo-rectangle.png" alt="Logo" className="h-10 w-10 object-contain mr-2" />
+              <img src="/logo/siloamLogo.png" alt="Logo" className="h-10 w-10 object-contain mr-2" />
               <span className="font-bold text-secondary-500 text-2xl">My</span> <span className="font-bold text-primary-500 text-2xl">Siloam</span>
             </div>
-            <Button variant="ghost" size="icon" className= "hover:bg-primary-500 hover:text-white" onClick={() => setIsMobileMenuOpen(false)}>
+            <Button variant="ghost" size="icon" className="hover:bg-primary-500 hover:text-white" onClick={() => setIsMobileMenuOpen(false)}>
               <X className="h-5 w-5" />
             </Button>
           </div>
@@ -131,12 +129,12 @@ const AdminLayout = ({ children }) => {
           <div className="px-4 py-4">
             <div className="flex items-center">
               <Avatar className="h-10 w-10 mr-3">
-                <AvatarImage src={adminProfile?.profileImg} alt="User" />
-                <AvatarFallback>{getInitials(adminProfile?.name)}</AvatarFallback>
+                <AvatarImage src={userProfile?.profileImg || "/avatar-placeholder.png"} alt="User" />
+                <AvatarFallback>{getInitials(userProfile?.name)}</AvatarFallback>
               </Avatar>
               <div>
-                <h3 className="font-medium text-sm">{adminProfile?.name || 'Loading...'}</h3>
-                <p className="text-xs text-muted-foreground">{adminProfile?.email || 'Loading...'}</p>
+                <h3 className="font-medium text-sm">{userProfile?.name || 'Loading...'}</h3>
+                <p className="text-xs text-muted-foreground">{userProfile?.email || 'Loading...'}</p>
               </div>
             </div>
           </div>
@@ -146,21 +144,21 @@ const AdminLayout = ({ children }) => {
           {/* Mobile Navigation */}
           <nav className="flex-1 px-2 py-4 space-y-1">
             {navItems.map((item) => (
-              <Link
+              <a
                 key={item.label}
-                to={item.href}
-                className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-300 ease-in-out transform hover:scale-105 ${
+                href={item.href}
+                className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
                   isActive(item.href)
                     ? "bg-primary-500 text-white shadow-md"
                     : "hover:bg-accent hover:text-accent-foreground"
                 }`}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                <item.icon className={`h-5 w-5 mr-3 transition-transform duration-300 ${isActive(item.href) ? "text-white scale-110" : ""}`} />
-                <span className={`transition-opacity duration-300 ${isActive(item.href) ? "opacity-100" : "opacity-90"}`}>
+                <item.icon className={`h-5 w-5 mr-3 ${isActive(item.href) ? "text-white" : ""}`} />
+                <span className={isActive(item.href) ? "opacity-100" : "opacity-90"}>
                   {item.label}
                 </span>
-              </Link>
+              </a>
             ))}
           </nav>
         </div>
@@ -186,19 +184,20 @@ const AdminLayout = ({ children }) => {
               <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(true)} className="lg:hidden hover:bg-primary-500 hover:text-white">
                 <Menu className="h-5 w-5" />
               </Button>
+              
             </div>
 
             {/* Right side - Notifications, Settings and Avatar */}
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="icon" className=" sm:flex hover:bg-primary-500 hover:text-white">
+              <Button variant="ghost" size="icon" className="sm:flex hover:bg-primary-500 hover:text-white">
                 <Bell className="h-5 w-5" />
               </Button>
               <Button variant="ghost" size="icon" className="sm:flex hover:bg-primary-500 hover:text-white">
                 <Settings className="h-5 w-5" />
               </Button>
               <Avatar className="h-8 w-8">
-                <AvatarImage src={adminProfile?.profileImg} alt="User" />
-                <AvatarFallback>{getInitials(adminProfile?.name)}</AvatarFallback>
+                <AvatarImage src={userProfile?.profileImg || "/avatar-placeholder.png"} alt="User" />
+                <AvatarFallback>{getInitials(userProfile?.name)}</AvatarFallback>
               </Avatar>
             </div>
           </div>
@@ -211,4 +210,4 @@ const AdminLayout = ({ children }) => {
   )
 }
 
-export default AdminLayout
+export default UserLayout 

@@ -58,13 +58,17 @@ const AllTickets = () => {
   })
   const [searchInput, setSearchInput] = useState(searchParams.get('search') || "")
 
+  const API_URL = import.meta.env.VITE_API_URL
+
   useEffect(() => {
     fetchTickets()
   }, [currentPage, selectedStatus, selectedPriority, searchQuery, sortOrder])
 
   // Fetch global totals (unfiltered)
   useEffect(() => {
-    fetch("http://localhost:3000/api/admin/tickets?page=1&limit=1")
+    fetch(`${API_URL}/api/admin/tickets?page=1&limit=1` ,{
+      credentials: 'include'
+    })
       .then(res => res.json())
       .then(data => {
         setGlobalTotals({
@@ -87,7 +91,9 @@ const AllTickets = () => {
     })
 
     try {
-      const res = await fetch(`http://localhost:3000/api/admin/tickets?${params}`)
+      const res = await fetch(`${API_URL}/api/admin/tickets?${params}` ,{
+        credentials: "include"
+      })
       const data = await res.json()
       if (data.success) {
         setTickets(data.tickets)
@@ -173,7 +179,7 @@ const AllTickets = () => {
     
     setIsDeleting(true);
     try {
-      const response = await fetch(`http://localhost:3000/api/tickets/${ticketToDelete}`, {
+      const response = await fetch(`${API_URL}/api/tickets/${ticketToDelete}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

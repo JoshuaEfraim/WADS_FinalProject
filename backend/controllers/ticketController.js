@@ -1,3 +1,5 @@
+// backend/controllers/ticketController.js
+
 import Ticket from '../models/ticket.js';
 import TicketReply from '../models/ticketReply.js';
 import User from '../models/user.js';
@@ -67,10 +69,9 @@ export const createTicket = async (req, res) => {
   }
 };
 
-/**
- * POST /api/tickets/:id/reply
- * Add a reply to a ticket (from admin or user)
- */
+// ———————————
+// 1) Create a reply on a ticket
+// ———————————
 export const replyToTicket = async (req, res) => {
   try {
     const { replyMessage } = req.body;
@@ -80,6 +81,7 @@ export const replyToTicket = async (req, res) => {
       return res.status(400).json({ message: 'Reply message is required' });
     }
 
+    // Find the ticket by ID
     const ticket = await Ticket.findById(req.params.id);
     if (!ticket) {
       return res.status(404).json({ message: 'Ticket not found' });
@@ -96,7 +98,6 @@ export const replyToTicket = async (req, res) => {
       userId: senderId,
       message: replyMessage,
     });
-
     await reply.save();
 
     // Determine recipient
@@ -150,19 +151,10 @@ export const replyToTicket = async (req, res) => {
 };
 
 
-export const getAllResolvedTickets = async (req, res) => {
-  try {
-    const tickets = await Ticket
-      .find({ status: 'RESOLVED' })
-      .populate('userId', 'name email')
-      .sort({ updatedAt: -1 });
 
-    res.json({ tickets });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
+// ———————————
+// 2) Return a single ticket + its replies
+// ———————————
 export const getTicketReply = async (req, res) => {
   try {
     const ticket = await Ticket
@@ -175,26 +167,72 @@ export const getTicketReply = async (req, res) => {
 
     const replies = await TicketReply
       .find({ ticketId: ticket._id })
+      .populate('senderId', 'name email')
       .sort({ createdAt: 1 });
 
-    res.json({ ticket, replies });
+    return res.json({ ticket, replies });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('❌ Error in getTicketReply:', err);
+    return res.status(500).json({
+      message: 'Error fetching ticket',
+      error: err.message,
+    });
   }
 };
 
+// ———————————
+// 3) Return only the ticket’s core fields (no replies)
+//     This is used by your “Details” tab (GET /api/tickets/:id).
+// ———————————
+export const getTicketDetails = async (req, res) => {
+  try {
+    const ticket = await Ticket
+      .findById(req.params.id)
+      .populate('userId', 'name email');
+
+    if (!ticket) {
+      return res.status(404).json({ message: 'Ticket not found' });
+    }
+    return res.json(ticket);
+  } catch (err) {
+    console.error('❌ Error in getTicketDetails:', err);
+    return res.status(500).json({ error: err.message });
+  }
+};
+
+// ———————————
+// 4) GET all resolved tickets (admin view)
+// ———————————
+export const getAllResolvedTickets = async (req, res) => {
+  try {
+    const tickets = await Ticket
+      .find({ status: 'RESOLVED' })
+      .populate('userId', 'name email')
+      .sort({ updatedAt: -1 });
+
+    return res.json({ tickets });
+  } catch (err) {
+    console.error('❌ Error in getAllResolvedTickets:', err);
+    return res.status(500).json({ error: err.message });
+  }
+};
+
+// ———————————
+// 5) GET ticket history for a specific user
+// ———————————
 export const getUserTicketHistory = async (req, res) => {
   try {
     const tickets = await Ticket
       .find({
         userId: req.params.userId,
-        status: 'RESOLVED'
+        status: 'RESOLVED',
       })
       .sort({ updatedAt: -1 });
 
-    res.json({ tickets });
+    return res.json({ tickets });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('❌ Error in getUserTicketHistory:', err);
+    return res.status(500).json({ error: err.message });
   }
 };
 
@@ -235,7 +273,7 @@ export async function getTicketDetails(req, res) {
     const ticket = await Ticket.findById(req.params.id).populate('userId', 'name email role');
     if (!ticket) return res.status(404).json({ message: 'Ticket not found' });
 
-    if (user.role !== 'ADMIN' && ticket.userId._id.toString() !== "6837e04f9275f96ff3a3c9bb") {
+    if (user.role !== 'ADMIN' && ticket.userId._id.toString() !== req.user.id) {
       return res.status(403).json({ message: 'Access denied' });
     }
 

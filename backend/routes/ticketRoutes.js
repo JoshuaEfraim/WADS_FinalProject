@@ -1,5 +1,3 @@
-// backend/routes/ticketRoutes.js
-
 import express from 'express';
 const router = express.Router();
 import { auth } from '../middleware/auth.js';
@@ -13,6 +11,7 @@ import {
   deleteTicket,
   createTicket
 } from '../controllers/ticketController.js';
+
 
 // Create a new ticket (requires authentication)
 router.post('/create', auth, createTicket);

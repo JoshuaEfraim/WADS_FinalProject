@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/service/user'; // Replace with your backend URL
+const API_URL = 'http://localhost:3000/service/user'; // Replace with your backend URL
 
 
 //signin
