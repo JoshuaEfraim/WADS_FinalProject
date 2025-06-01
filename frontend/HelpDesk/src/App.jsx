@@ -124,6 +124,7 @@ const App = () => {
             <Route path="dashboard" element={<UserDashboard />} />
             <Route path="tickets/:id" element={<UserTicketDetails />} />
             <Route path="profile" element={<ProfileSettings />} />
+            <Route path="ticketHistory" element={<TicketHistory/>}/>
           </Route>
 
           {/* Ticket Form Route */}

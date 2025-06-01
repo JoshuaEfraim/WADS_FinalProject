@@ -23,7 +23,8 @@ router.get("/dashboard", auth,getUserTickets)
 // Google OAuth routes
 router.get('/auth/google',
   passport.authenticate('google', { 
-    scope: ['profile', 'email']
+    scope: ['profile', 'email'],
+    prompt:'select_account'
   })
 );
 router.get('/auth/google/callback',

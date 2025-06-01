@@ -17,7 +17,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 function getPriorityClass(priority) {
   const classes = {
@@ -50,7 +50,15 @@ export default function TicketHistory() {
   const [showSortDropdown, setShowSortDropdown] = useState(false);
 
   const navigate = useNavigate();
+  const location = useLocation();
   const API_URL = import.meta.env.VITE_API_URL;
+
+  const handleViewTicket = (ticketId) => {
+    // Check if we're in the admin section based on the current URL path
+    const isAdminRoute = location.pathname.startsWith('/admin');
+    const path = isAdminRoute ? `/admin/tickets/${ticketId}` : `/user/tickets/${ticketId}`;
+    navigate(path);
+  };
 
   // ─── Whenever `page` changes, reload history ─────────────────────────
   useEffect(() => {
@@ -58,7 +66,7 @@ export default function TicketHistory() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 
-  // ─── Fetch “Ticket History” from backend with ?page & ?limit ─────────
+  // ─── Fetch "Ticket History" from backend with ?page & ?limit ─────────
   async function loadHistory() {
     setLoading(true);
     try {
@@ -100,7 +108,7 @@ export default function TicketHistory() {
     }
   }
 
-  // Apply search + sort on the current page’s tickets
+  // Apply search + sort on the current page's tickets
   const filteredTickets = tickets
     .filter((t) =>
       t.subject.toLowerCase().includes(searchQuery.toLowerCase())
@@ -267,7 +275,7 @@ export default function TicketHistory() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => navigate(`/admin/tickets/${t._id}`)}
+                      onClick={() => handleViewTicket(t._id)}
                     >
                       View
                     </Button>
@@ -303,7 +311,7 @@ export default function TicketHistory() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => navigate(`/admin/ticket-reply/${t._id}`)}
+                onClick={() => handleViewTicket(t._id)}
               >
                 View
               </Button>

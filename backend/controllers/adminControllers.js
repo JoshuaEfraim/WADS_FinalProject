@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import TicketReply from '../models/ticketReply.js'
 import approvedTicket from '../models/approvedTicket.js'
 import notification from '../models/notification.js'
+import { sendEmail } from '../utils/sendemail.js';
 
 // ADMIN CONTROLLER
 
@@ -247,16 +248,16 @@ export async function getAdminTickets(req, res) {
 export async function updateTicket(req, res) {
   try {
     const user = await User.findById(req.user.id);
-    // const user = await User.findOne({role: "ADMIN"});  // testing purposes
     const ticket = await Ticket.findById(req.params.id);
     if (!ticket) return res.status(404).json({ message: 'Ticket not found' });
 
     // Access control
-    if (user.role !== 'ADMIN' && ticket.userId.toString() !== req.user.id) {
+    if (user.role !== 'ADMIN' && ticket.userId._id.toString() !== req.user.id) {
       return res.status(403).json({ message: 'Access denied' });
     }
 
     const prevStatus = ticket.status;
+    let newStatus;
 
     // Non-admin user restrictions
     if (user.role.toUpperCase() !== 'ADMIN') {
@@ -271,9 +272,9 @@ export async function updateTicket(req, res) {
       ticket.set(req.body);
     } else {
       // Admin can update everything
-      const newStatus = req.body.status?.toUpperCase();
+      newStatus = req.body.status?.toUpperCase();
 
-      //  Prevent changing status back to AWAITING_APPROVAL after it's approved
+      // Prevent reverting to AWAITING_APPROVAL
       if (prevStatus !== 'AWAITING_APPROVAL' && newStatus === 'AWAITING_APPROVAL') {
         return res.status(403).json({ message: 'Cannot revert status to AWAITING_APPROVAL after approval' });
       }
@@ -284,27 +285,78 @@ export async function updateTicket(req, res) {
         ...(req.body.priority && { priority: req.body.priority.toUpperCase() })
       });
 
-      // Log approval and notify user
-      if (prevStatus === 'AWAITING_APPROVAL' && newStatus === 'PENDING') {
-        await approvedTicket.create({
-          ticketId: ticket._id,
-          adminId: user._id
-        });
+      // Save the ticket first to ensure the update succeeds
+      await ticket.save();
 
-        //  approval notification
-      }
+      // Handle notifications after successful save
+      try {
+        // Log approval and send notification
+        if (prevStatus === 'AWAITING_APPROVAL' && newStatus === 'PENDING') {
+          await approvedTicket.create({
+            ticketId: ticket._id,
+            adminId: user._id
+          });
 
-      // Notify user on any other status change
-      if (newStatus && prevStatus !== newStatus) {
-        // status change notification
+          try {
+            await sendEmail(
+              ticket.userId.email,
+              'Ticket Approved',
+              `Hi ${ticket.userId.name},\n\nYour ticket has been approved and is now pending.\n\nThanks,\nSupport Team`
+            );
+          } catch (emailError) {
+            console.error('Failed to send approval email:', emailError);
+          }
+        }
+
+        // Handle rejected tickets
+        if (prevStatus === 'AWAITING_APPROVAL' && newStatus === 'REJECTED') {
+          try {
+            await sendEmail(
+              ticket.userId.email,
+              'Ticket Rejected',
+              `Hi ${ticket.userId.name},\n\nWe regret to inform you that your ticket has been rejected.\n\nReason: ${req.body.rejectionReason || 'No reason provided'}\n\nThanks,\nSupport Team`
+            );
+          } catch (emailError) {
+            console.error('Failed to send rejection email:', emailError);
+          }
+        }
+
+        // Status change notifications
+        if (newStatus && prevStatus !== newStatus) {
+          let subject = '';
+          let message = '';
+
+          if (prevStatus === 'PENDING' && newStatus === 'PROCESSING') {
+            subject = 'Ticket in Progress';
+            message = `Hi ${ticket.userId.name},\n\nYour ticket is now being processed.\n\nThanks,\nSupport Team`;
+          } else if (prevStatus === 'PROCESSING' && newStatus === 'RESOLVED') {
+            subject = 'Ticket Resolved';
+            message = `Hi ${ticket.userId.name},\n\nYour ticket has been resolved and closed.\n\nThanks,\nSupport Team`;
+          }
+
+          if (subject && message) {
+            try {
+              await sendEmail(ticket.userId.email, subject, message);
+            } catch (emailError) {
+              console.error('Failed to send status update email:', emailError);
+            }
+          }
+        }
+      } catch (notificationError) {
+        console.error('Error handling notifications:', notificationError);
+        // Continue execution - notifications are non-critical
       }
     }
 
-    await ticket.save();
-    const updated = await Ticket.findById(ticket._id).populate('userId', 'name email');
+    // For non-admin updates or if no notifications were needed
+    if (!newStatus) {
+      await ticket.save();
+    }
 
+    const updated = await Ticket.findById(ticket._id).populate('userId', 'name email');
     res.json(updated);
   } catch (error) {
+    console.error('Error updating ticket:', error);
     res.status(500).json({ message: 'Error updating ticket', error: error.message });
   }
 }
