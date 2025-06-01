@@ -244,6 +244,52 @@ export async function getAdminTickets(req, res) {
   }
 }
 
+<<<<<<< HEAD
+=======
+export async function getTicketDetails(req, res) {
+  try {
+    // const user = await User.findById(req.user.id);
+    const user = await User.findOne({role:"ADMIN"})
+    const ticket = await Ticket.findById(req.params.id).populate('userId', 'name email role');
+    if (!ticket) return res.status(404).json({ message: 'Ticket not found' });
+
+    if (user.role !== 'ADMIN' && ticket.userId._id.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+
+    res.json(ticket);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching ticket', error: error.message });
+  }
+}
+
+export async function getTicketByStatus(req, res) {
+  try {
+    const status = req.params.status.toUpperCase();
+
+    const tickets = await Ticket.find({ status })
+      .sort({ createdAt: -1 }); // descending order
+
+    res.json(tickets);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching tickets', error: error.message });
+  }
+}
+
+export async function getTicketByPriority(req, res) {
+  try {
+    const priority = req.params.priority.toUpperCase();
+
+    const tickets = await Ticket.find({ priority })
+      .sort({ createdAt: -1 }); // descending order
+
+    res.json(tickets);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching tickets', error: error.message });
+  }
+}
+
+>>>>>>> TicketReply
 export async function updateTicket(req, res) {
   try {
     const user = await User.findById(req.user.id);
