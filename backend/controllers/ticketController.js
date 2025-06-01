@@ -173,7 +173,7 @@ export async function getTicketDetails(req, res) {
     const ticket = await Ticket.findById(req.params.id).populate('userId', 'name email role');
     if (!ticket) return res.status(404).json({ message: 'Ticket not found' });
 
-    if (user.role !== 'ADMIN' && ticket.userId._id.toString() !== "6837e04f9275f96ff3a3c9bb") {
+    if (user.role !== 'ADMIN' && ticket.userId._id.toString() !== req.user.id) {
       return res.status(403).json({ message: 'Access denied' });
     }
 

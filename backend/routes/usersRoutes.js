@@ -1,5 +1,5 @@
 import express from 'express';
-import { signUp, signIn, updateUser, getProfile, forgotPassword, resetPassword } from '../controllers/users.js';
+import { signUp, signIn, updateUser, getProfile, forgotPassword, resetPassword, getUserTickets } from '../controllers/users.js';
 import passport from '../config/passport.js';
 import jwt from 'jsonwebtoken';
 import { auth } from '../middleware/auth.js';
@@ -16,6 +16,7 @@ router.post("/forgot-password", forgotPassword)
 router.post("/reset-password", resetPassword)
 router.put("/update/:id", auth, upload.single('profileImage'), updateUser)
 router.get("/profile", auth, getProfile)
+router.get("/dashboard", getUserTickets)
 
 // Google OAuth routes
 router.get('/auth/google',

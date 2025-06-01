@@ -22,8 +22,7 @@ import {
   Loader2,
 } from "lucide-react"
 
-const API_URL = "http://localhost:3000/api/tickets/ticketDetails"
-const UPDATE_URL = "http://localhost:3000/api/admin/ticket"
+const API_URL = import.meta.env.VITE_API_URL
 
 const statusOptions = ["AWAITING_APPROVAL", "PENDING", "REJECTED", "PROCESSING", "RESOLVED"]
 const priorityOptions = ["LOW", "MEDIUM", "HIGH"]
@@ -55,7 +54,7 @@ export default function TicketDetails() {
 
   useEffect(() => {
     setLoading(true)
-    fetch(`${API_URL}/${id}`)
+    fetch(`${API_URL}/api/tickets/ticketDetails${id}`)
       .then((res) => res.json())
       .then((data) => {
         setTicket(data)
@@ -78,7 +77,7 @@ export default function TicketDetails() {
     setSuccess(false)
     setError(null)
     try {
-      const res = await fetch(`${UPDATE_URL}/${id}`, {
+      const res = await fetch(`${API_URL}/api/ticket/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),

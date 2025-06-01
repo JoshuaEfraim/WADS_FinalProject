@@ -15,7 +15,7 @@ const AdminLayout = ({ children }) => {
   useEffect(() => {
     const fetchAdminProfile = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/admin/profile')
+        const response = await fetch('http://localhost:3000/api/admin/profile') 
         if (!response.ok) throw new Error('Failed to fetch admin profile')
         const data = await response.json()
         setAdminProfile(data)
@@ -184,11 +184,6 @@ const AdminLayout = ({ children }) => {
               <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(true)} className="lg:hidden hover:bg-primary-500 hover:text-white">
                 <Menu className="h-5 w-5" />
               </Button>
-              {/* Search Bar */}
-              <div className="relative w-full lg:w-96">
-                <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input type="text" placeholder="Search..." className="pl-9 w-full rounded-full bg-background" />
-              </div>
             </div>
 
             {/* Right side - Notifications, Settings and Avatar */}
