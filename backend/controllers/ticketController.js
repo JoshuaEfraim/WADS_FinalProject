@@ -2,6 +2,8 @@ import Ticket from '../models/ticket.js';
 import TicketReply from '../models/ticketReply.js';
 import User from '../models/user.js';
 import approvedTicket from '../models/approvedTicket.js';
+import { sendEmail } from '../utils/sendemail.js';
+
 
 /**
  * POST /api/tickets/:id/reply
@@ -9,10 +11,11 @@ import approvedTicket from '../models/approvedTicket.js';
  */
 export const replyToTicket = async (req, res) => {
   try {
-    const { replyMessage, senderId, senderRole } = req.body;
+    const { replyMessage } = req.body;
+    const senderId = req.user.id;
 
-    if (!['admin', 'user'].includes(senderRole)) {
-      return res.status(400).json({ message: 'senderRole must be "admin" or "user"' });
+    if (!replyMessage) {
+      return res.status(400).json({ message: 'Reply message is required' });
     }
 
     const ticket = await Ticket.findById(req.params.id);
@@ -20,19 +23,70 @@ export const replyToTicket = async (req, res) => {
       return res.status(404).json({ message: 'Ticket not found' });
     }
 
+    console.log('senderId:', senderId);
+    const sender = await User.findById(senderId);
+    if (!sender) {
+      return res.status(404).json({ message: 'Sender not found' });
+    }
+
     const reply = new TicketReply({
       ticketId: ticket._id,
-      senderId,
-      senderRole,
+      userId: senderId,
       message: replyMessage,
     });
 
     await reply.save();
-    res.status(201).json({ message: 'Reply added successfully', reply });
+
+    // Determine recipient
+    let recipient;
+    let subject, message;
+
+    if (sender.role === 'ADMIN') {
+      // notify the user who created the ticket
+      recipient = await User.findById(ticket.userId);
+      subject = 'Your support ticket has a new reply';
+      message = `Hello ${recipient.name},\n\nAn admin has replied to your ticket with ticket ID: ${ticket._id}. Please view the response.`;
+    } else {
+      // Find the admin who previously replied to this ticket
+      const previousAdminReply = await TicketReply.findOne({
+        ticketId: ticket._id,
+        userId: { $ne: ticket.userId } // not the ticket creator
+      }).sort({ createdAt: -1 }); // get the most recent admin reply
+
+      if (previousAdminReply) {
+        recipient = await User.findById(previousAdminReply.userId);
+      }
+
+      if (recipient && recipient.role === 'ADMIN') {
+        subject = 'A user has replied to a support ticket';
+        message = `Hello ${recipient.name},\n\nA user has replied to ticket ID: ${ticket._id}. Please check the admin dashboard for details.`;
+      } else {
+        console.log('No previous admin found in the conversation');
+        // Don't send an email if no previous admin found
+        recipient = null;
+      }
+    }
+
+    if (recipient?.email) {
+      try {
+        await sendEmail(
+          recipient.email,
+          subject,
+          message
+        );
+        console.log('Email sent successfully to:', recipient.email);
+      } catch (emailError) {
+        console.error('Failed to send email:', emailError);
+      }
+    }
+
+    res.status(201).json({ message: 'Reply added and notification sent', reply });
   } catch (err) {
+    console.error('Error in replyToTicket:', err);
     res.status(500).json({ error: err.message });
   }
 };
+
 
 export const getAllResolvedTickets = async (req, res) => {
   try {

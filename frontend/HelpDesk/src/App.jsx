@@ -9,6 +9,12 @@ import Settings from './pages/Admin/Settings'
 import TicketDetails from './pages/Admin/TicketDetails'
 import TicketHistory from './pages/Admin/TicketHistory'
 import AdminLayout from './components/AdminLayout'
+import LoginPage from './pages/Auth/LoginPage'
+import RegisterPage from './pages/Auth/RegisterPage'
+import ForgotPasswordPage from './pages/Auth/forgotpasswordpage'
+import ResetPasswordPage from './pages/Auth/ResetPasswordPage'
+import ProfileSettings from './components/ProfileSettings'
+import { ToastContainer } from './components/ui/toast'
 
 // User Pages
 import UserTicketDetails from './pages/User/UserTicketDetails'
@@ -18,8 +24,16 @@ const App = () => {
     <BrowserRouter>
       <Routes>
         {/* Redirect root to a default route */}
-        <Route path="/" element={<Navigate to="/user" replace />} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
 
+        
+        {/* Auth routes */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+        <Route path="/profile" element={<ProfileSettings />} />
+        
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />

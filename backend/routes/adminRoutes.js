@@ -1,4 +1,5 @@
 import express from 'express';
+import { auth, isAdmin } from '../middleware/auth.js';
 import {getAdminDashboardData, 
         getAdminTickets,
         getAllUsers,
@@ -8,14 +9,14 @@ from '../controllers/adminControllers.js';
 
 const router = express.Router();
 
-router.get("/users", getAllUsers)
+router.get("/users", auth, isAdmin, getAllUsers)
 
-router.get("/tickets", getAdminTickets)
+router.get("/tickets", auth, isAdmin, getAdminTickets)
 
-router.get("/dashboard", getAdminDashboardData)
+router.get("/dashboard", auth, isAdmin, getAdminDashboardData)
 
-router.get("/profile", getCurrentAdmin)
+router.get("/profile", auth, isAdmin, getCurrentAdmin)
 
-router.patch("/ticket/:ticketId" , updateTicket);
+router.patch("/ticket/:ticketId", auth, isAdmin, updateTicket);
 
 export default router;

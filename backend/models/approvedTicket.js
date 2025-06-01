@@ -8,7 +8,7 @@ const approvedTicketSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Composite unique index
-approvedTicketSchema.index({ ticketId: 1, adminId: 1 }, { unique: true });
+approvedTicketSchema.index({ ticketId: 1, userId: 1 }, { unique: true });
 
 const approvedTicket = mongoose.model("approvedTicket", approvedTicketSchema)
 
