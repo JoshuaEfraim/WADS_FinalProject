@@ -47,7 +47,7 @@ const App = () => {
 
         {/* User Routes */}
           {/* <Route path="userTickets/:id" element={<UserTicketDetails />} /> */}
-
+          
       </Routes>
     </BrowserRouter>
   )
