@@ -24,7 +24,7 @@ router.get('/history/resolved', getAllResolvedTickets);
 router.get("/history/admin", getAllResolvedTickets)
 
 // Ticket “details” endpoint (front end also calls this)
-router.get('/:id', getTicketDetails);
+router.get('/ticketDetails/:id', getTicketDetails);
 
 
 export default router;
