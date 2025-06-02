@@ -17,7 +17,7 @@ const port = process.env.PORT;
 
 // Enable CORS
 app.use(cors({
-    origin: "*",
+    origin: "https://e2425-wads-l4ccg1-client.csbihub.id",
     credentials: true,
 }));
 
