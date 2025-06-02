@@ -20,14 +20,6 @@ export default defineConfig(({ mode }) => {
           secure: mode !== "development",
           ws: true,
         },
-        "/service": {
-          target: mode === "development"
-            ? "https://e2425-wads-l4ccg1-server.csbihub.id"
-            : "https://e2425-wads-l4ccg1-server.csbihub.id",
-          changeOrigin: true,
-          secure: mode !== "development",
-          ws: true,
-        },
       },
     },
     build: {
