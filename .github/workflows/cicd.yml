@@ -28,7 +28,7 @@ jobs:
 
       - name: Build and Push Frontend Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/wads-frontend:latest ./frontend/helpdesk
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/wads-frontend:latest ./frontend/HelpDesk
           docker push ${{ secrets.DOCKER_USERNAME }}/wads-frontend:latest
 
   continuous-deployment:
