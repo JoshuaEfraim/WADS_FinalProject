@@ -7,6 +7,7 @@ services:
     environment:
       PORT: 3030
       MONGO_URI : mongodb://e2425-wads-l4ccg1:4isam9dl@10.25.143.17:27017/e2425-wads-l4ccg1?authSource=e2425-wads-l4ccg1
+      SESSION_SECRET : secret
       REFRESH_TOKEN_SECRET: IW14783REUIBJIIO
       RESET_TOKEN_SECRET: UBSNMZPXVAO12131
       GMAIL_USER: efraim.rawatan@gmail.com
