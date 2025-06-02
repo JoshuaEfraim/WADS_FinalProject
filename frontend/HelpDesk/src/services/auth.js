@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const API_URL = "/user"; 
+const API_URL =
+  import.meta.env.MODE === "development"
+    ? "/api/user"
+    : "https://e2425-wads-l4ccg1-server.csbihub.id/api/user";
 
 //signin
 const authService = {

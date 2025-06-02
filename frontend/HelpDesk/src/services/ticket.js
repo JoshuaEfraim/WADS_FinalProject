@@ -2,7 +2,10 @@ import axios from 'axios';
 
 const URL = import.meta.env.VITE_API_URL
 
-const API_URL = "/tickets"; // Match your backend route
+const API_URL =
+  import.meta.env.MODE === "development"
+    ? "/api/tickets"
+    : "https://e2425-wads-l4ccg1-server.csbihub.id/api/tickets"; // Match your backend route
 
 const ticketService = {
   /**
@@ -33,8 +36,6 @@ const ticketService = {
     }
   },
 
-  // You can add other ticket-related API calls here later
-  // Like getTickets, updateTicket, deleteTicket, etc.
 };
 
 export default ticketService; 
