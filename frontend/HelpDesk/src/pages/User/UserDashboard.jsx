@@ -46,7 +46,7 @@ const UserDashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${API_URL}/service/user/dashboard`, {
+        const response = await fetch(`${API_URL}/api/user/dashboard`, {
           credentials: 'include'
         });
         if (!response.ok) {
