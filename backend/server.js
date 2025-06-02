@@ -12,14 +12,13 @@ import cookieParser from "cookie-parser";
 dotenv.config()
 
 const app = express();
+app.use(express.json());
 const port = process.env.PORT;
 
 // Enable CORS
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: "*",
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // Add cookie parser middleware
@@ -27,7 +26,7 @@ app.use(cookieParser());
 
 // Add session middleware
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'your-secret-key',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -39,7 +38,6 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(express.json());
 
 app.use("/api/admin", adminRoutes)
 app.use("/api/tickets", ticketRoutes)
