@@ -18,7 +18,7 @@ services:
       GOOGLE_CLIENT_SECRET: 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
       FRONTEND_URL : http://localhost:5173
     ports:
-      - "3029:3030"
+      - "3030:3030"
 
   frontend:
     image: suwandithe03/wads-frontend:latest
@@ -26,4 +26,4 @@ services:
     depends_on:
       - backend
     ports:
-      - "3029:3030"
+      - "3029:3029"
