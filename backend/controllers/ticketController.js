@@ -285,7 +285,7 @@ export async function getTicketDetails(req, res) {
     if (ticket.status !== 'AWAITING_APPROVAL') {
       const approval = await approvedTicket.findOne({ ticketId: ticket._id })
         .populate('adminId', 'name email');
-      if (approval) {
+      if (approval && approval.adminId && approval.adminId.name) {
         approvalInfo = {
           approvedBy: approval.adminId.name,
           approvedAt: approval.createdAt
