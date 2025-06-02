@@ -140,7 +140,7 @@ const ManageUsers = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {users.map((user) => (
+            {users.filter(user => user.role !== "ADMIN").map((user) => (
               <TableRow key={user._id}>
                 <TableCell className="font-medium">{user._id}</TableCell>
                 <TableCell>
