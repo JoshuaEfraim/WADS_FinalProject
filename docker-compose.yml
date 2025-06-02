@@ -6,7 +6,7 @@ services:
     restart: always
     environment:
       PORT: 3000
-      MONGO_URI : mongodb://e2425-wads-l4ccg1:4isam9dl@localhost:27018/e2425-wads-l4ccg1?authSource=e2425-wads-l4ccg1
+      MONGO_URI : mongodb://e2425-wads-l4ccg1:4isam9dl@10.25.143.17:27017/e2425-wads-l4ccg1?authSource=e2425-wads-l4ccg1
       REFRESH_TOKEN_SECRET: IW14783REUIBJIIO
       RESET_TOKEN_SECRET: UBSNMZPXVAO12131
       GMAIL_USER: efraim.rawatan@gmail.com
@@ -16,7 +16,7 @@ services:
       CLOUDINARY_API_SECRET : S6pz840MrlffSbPPc2LG_-7-PxY
       GOOGLE_CLIENT_ID: 19196271885-65elehm12dvd3oedj7uetnqgrst4knnf.apps.googleusercontent.com
       GOOGLE_CLIENT_SECRET: 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
-      FRONTEND_URL : http://localhost:5173
+      FRONTEND_URL : https://e2425-wads-l4ccg1-client.csbihub.id
     ports:
       - "3030:3030"
 
