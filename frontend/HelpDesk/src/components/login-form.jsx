@@ -111,7 +111,7 @@ export function LoginForm({ className = "" }) {
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
                 <img
-                  src="/src/assets/logo/siloamLogo-rectangle.png"
+                  src="/logo/siloamLogo-rectangle.png"
                   alt="Siloam Building"
                   className="h-17 w-67"
                 />
@@ -196,7 +196,7 @@ export function LoginForm({ className = "" }) {
           </form>
           <div className="relative hidden bg-muted md:block">
             <img
-              src="/src/assets/logo/Siloam Building.jpg"
+              src="/logo/Siloam Building.jpg"
               alt="Siloam Building"
               className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
             />

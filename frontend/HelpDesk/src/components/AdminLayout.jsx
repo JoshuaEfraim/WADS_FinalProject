@@ -86,7 +86,7 @@ const AdminLayout = ({ children }) => {
       >
         {/* Logo */}
         <div className="flex items-center justify-center h-24 w-full">
-          <img src="/src/assets/logo/siloamLogo-rectangle.png" alt="Logo" className="h-40 w-40 object-contain" />
+          <img src="/logo/siloamLogo-rectangle.png" alt="Logo" className="h-40 w-40 object-contain" />
         </div>
 
         {/* User Profile - Vertical layout */}
@@ -151,7 +151,7 @@ const AdminLayout = ({ children }) => {
           {/* Mobile Sidebar Header */}
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center">
-              <img src="/src/assets/logo/siloamLogo-rectangle.png" alt="Logo" className="h-10 w-10 object-contain mr-2" />
+              <img src="/logo/siloamLogo-rectangle.png" alt="Logo" className="h-10 w-10 object-contain mr-2" />
               <span className="font-bold text-secondary-500 text-2xl">My</span> <span className="font-bold text-primary-500 text-2xl">Siloam</span>
             </div>
             <Button variant="ghost" size="icon" className= "hover:bg-primary-500 hover:text-white" onClick={() => setIsMobileMenuOpen(false)}>
