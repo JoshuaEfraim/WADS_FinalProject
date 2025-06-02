@@ -16,7 +16,7 @@ export default function TicketReplyPage() {
   const [error, setError] = useState(null)
   const [refreshKey, setRefreshKey] = useState(0)  // bump to force ReplyList to re‐fetch
 
-  const API_URL = import.meta.env.VITE_API_URL
+  const API_URL = "http://localhost:3000"
 
   useEffect(() => {
     // Fetch the ticket's main data (subject + description)

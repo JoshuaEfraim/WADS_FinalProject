@@ -41,7 +41,7 @@ const UserDashboard = () => {
   const statusOptions = ["ALL", "PENDING", "PROCESSING", "RESOLVED", "AWAITING_APPROVAL", "REJECTED"]
   const priorityOptions = ["ALL", "HIGH", "MEDIUM", "LOW"]
 
-  const API_URL = import.meta.env.VITE_API_URL
+  const API_URL = "http://localhost:3000"
 
   useEffect(() => {
     const fetchData = async () => {

@@ -58,7 +58,7 @@ const AllTickets = () => {
   })
   const [searchInput, setSearchInput] = useState(searchParams.get('search') || "")
 
-  const API_URL = import.meta.env.VITE_API_URL
+  const API_URL = "http://localhost:3000"
 
   useEffect(() => {
     fetchTickets()

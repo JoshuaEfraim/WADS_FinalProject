@@ -23,7 +23,7 @@ import {
 } from "lucide-react"
 import TicketReplyPage from "./TicketReplyPage";
 
-const API_URL = import.meta.env.VITE_API_URL
+const API_URL = "http://localhost:3000"
 
 const statusOptions = ["AWAITING_APPROVAL", "PENDING", "REJECTED", "PROCESSING", "RESOLVED"]
 const priorityOptions = ["LOW", "MEDIUM", "HIGH"]

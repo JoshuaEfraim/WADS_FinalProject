@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  backend:
+    image: suwandithe03/wads-backend:latest
+    restart: always
+    environment:
+      PORT: 3000
+      MONGO_URI : mongodb://e2425-wads-l4ccg1:4isam9dl@localhost:27018/e2425-wads-l4ccg1?authSource=e2425-wads-l4ccg1
+      REFRESH_TOKEN_SECRET: IW14783REUIBJIIO
+      RESET_TOKEN_SECRET: UBSNMZPXVAO12131
+      GMAIL_USER: efraim.rawatan@gmail.com
+      GMAIL_PASS: sjfjvdlytizvaiir
+      CLOUD_NAME: dpnfdwefz
+      CLOUDINARY_API_KEY: 311334267411368
+      CLOUDINARY_API_SECRET : S6pz840MrlffSbPPc2LG_-7-PxY
+      GOOGLE_CLIENT_ID: 19196271885-65elehm12dvd3oedj7uetnqgrst4knnf.apps.googleusercontent.com
+      GOOGLE_CLIENT_SECRET: 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
+      FRONTEND_URL : http://localhost:5173
+    ports:
+      - "3029:3030"
+
+  frontend:
+    image: suwandithe03/wads-frontend:latest
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "3029:3030"

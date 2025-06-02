@@ -30,7 +30,7 @@ const ManageUsers = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
   const { toast } = useToast();
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL = "http://localhost:3000"
 
   useEffect(() => {
     fetchUsers();

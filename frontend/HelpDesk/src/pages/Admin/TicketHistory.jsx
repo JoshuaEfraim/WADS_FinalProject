@@ -51,7 +51,7 @@ export default function TicketHistory() {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL = "http://localhost:3000"
 
   const handleViewTicket = (ticketId) => {
     // Check if we're in the admin section based on the current URL path
