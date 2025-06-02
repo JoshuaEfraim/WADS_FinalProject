@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => {
       proxy: {
         "/api": {
           target: mode === "development"
-            ? "http://localhost:3000"
+            ? "https://e2425-wads-l4ccg1-server.csbihub.id"
             : "https://e2425-wads-l4ccg1-server.csbihub.id",
           changeOrigin: true,
           secure: mode !== "development",
@@ -22,7 +22,7 @@ export default defineConfig(({ mode }) => {
         },
         "/service": {
           target: mode === "development"
-            ? "http://localhost:3000"
+            ? "https://e2425-wads-l4ccg1-server.csbihub.id"
             : "https://e2425-wads-l4ccg1-server.csbihub.id",
           changeOrigin: true,
           secure: mode !== "development",
