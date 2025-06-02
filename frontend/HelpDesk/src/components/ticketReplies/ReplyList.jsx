@@ -62,6 +62,8 @@ export default function ReplyList({ ticketId, refreshKey }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const API_URL = import.meta.env.VITE_API_URL
+
   useEffect(() => {
     async function fetchReplies() {
       setLoading(true);
@@ -70,7 +72,7 @@ export default function ReplyList({ ticketId, refreshKey }) {
         // **Must** call /api/tickets/ticketReply/:ticketId
         // This endpoint returns { ticket: {...}, replies: [ ... ] }
         const res = await axios.get(
-          `http://localhost:5000/api/tickets/ticketReply/${ticketId}`,{
+          `${API_URL}/api/tickets/ticketReply/${ticketId}`,{
             withCredentials:true
           }
         );

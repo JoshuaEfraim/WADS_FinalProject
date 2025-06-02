@@ -11,11 +11,13 @@ export default function TicketRepliesSection({ ticketId, ticketStatus }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const API_URL = import.meta.env.VITE_API_URL
+
   useEffect(() => {
     const fetchReplies = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:5000/api/tickets/ticketReply/${ticketId}`);
+        const response = await axios.get(`${API_URL}/api/tickets/ticketReply/${ticketId}`);
         setReplies(response.data.ticket.replies || []);
         setError(null);
       } catch (err) {

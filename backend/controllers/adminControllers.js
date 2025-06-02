@@ -53,13 +53,13 @@ export async function getAdminDashboardData(req, res) {
       },
       {
         $project: {
-          day: { $dayOfWeek: "$createdAt" }, // 1 (Sunday) - 7 (Saturday)
+          date: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
           status: 1
         }
       },
       {
         $group: {
-          _id: { day: "$day", status: "$status" },
+          _id: { date: "$date", status: "$status" },
           count: { $sum: 1 }
         }
       }
@@ -202,9 +202,9 @@ export async function getAdminTickets(req, res) {
           'userId.email': 1
         }
       },
+      { $sort: { createdAt: sortOrder } },
       { $skip: skip },
-      { $limit: limitNum },
-      { $sort: { createdAt: sortOrder } }
+      { $limit: limitNum }
     ]);
 
     // Get total count

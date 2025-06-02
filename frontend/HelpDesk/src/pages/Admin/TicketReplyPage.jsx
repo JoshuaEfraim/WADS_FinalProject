@@ -16,11 +16,13 @@ export default function TicketReplyPage() {
   const [error, setError] = useState(null)
   const [refreshKey, setRefreshKey] = useState(0)  // bump to force ReplyList to re‐fetch
 
+  const API_URL = import.meta.env.VITE_API_URL
+
   useEffect(() => {
     // Fetch the ticket's main data (subject + description)
     setLoading(true)
     axios
-      .get(`http://localhost:5000/api/tickets/ticketReply/${id}`,{
+      .get(`${API_URL}/api/tickets/ticketReply/${id}`,{
         withCredentials:true
       })
       .then((res) => {

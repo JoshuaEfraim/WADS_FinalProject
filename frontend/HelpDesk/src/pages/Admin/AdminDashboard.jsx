@@ -106,17 +106,9 @@ const AdminDashboard = () => {
       dateMap[key] = {}
     }
     chartData.forEach(item => {
-      // Convert day of week to date in the last 7 days
-      // $dayOfWeek: 1 (Sun) - 7 (Sat)
-      // Find the date in the last 7 days that matches this day of week
-      for (let i = 6; i >= 0; i--) {
-        const d = new Date()
-        d.setDate(d.getDate() - i)
-        if (d.getDay() === item._id.day % 7) { // JS: 0=Sun, Mongo: 1=Sun
-          const key = d.toISOString().slice(0, 10)
-          dateMap[key][item._id.status] = (dateMap[key][item._id.status] || 0) + item.count
-          break
-        }
+      const dateKey = item._id.date
+      if (dateMap[dateKey]) {
+        dateMap[dateKey][item._id.status] = (dateMap[dateKey][item._id.status] || 0) + item.count
       }
     })
     // Build chart data arrays for each status
@@ -469,7 +461,7 @@ const AdminDashboard = () => {
                     dataKey={status}
                     stroke={chartColors[status]}
                     strokeWidth={3}
-                    dot={{ r: 5, stroke: '#fff', strokeWidth: 2 }}
+                    dot={{ r: 5, stroke: '#1E266D', strokeWidth: 2 }}
                     activeDot={{ r: 7 }}
                   />
                 ))}
