@@ -62,7 +62,7 @@ export default function ReplyList({ ticketId, refreshKey }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const API_URL = "http://localhost:3000"
+  const API_URL = "https://e2425-wads-l4ccg1-server.csbihub.id"
 
   useEffect(() => {
     async function fetchReplies() {

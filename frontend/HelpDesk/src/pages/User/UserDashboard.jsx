@@ -41,7 +41,7 @@ const UserDashboard = () => {
   const statusOptions = ["ALL", "PENDING", "PROCESSING", "RESOLVED", "AWAITING_APPROVAL", "REJECTED"]
   const priorityOptions = ["ALL", "HIGH", "MEDIUM", "LOW"]
 
-  const API_URL = "http://localhost:3000"
+  const API_URL = "https://e2425-wads-l4ccg1-server.csbihub.id"
 
   useEffect(() => {
     const fetchData = async () => {

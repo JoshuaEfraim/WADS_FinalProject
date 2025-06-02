@@ -51,7 +51,7 @@ export default function TicketHistory() {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const API_URL = "http://localhost:3000"
+  const API_URL = "https://e2425-wads-l4ccg1-server.csbihub.id"
 
   const handleViewTicket = (ticketId) => {
     // Check if we're in the admin section based on the current URL path

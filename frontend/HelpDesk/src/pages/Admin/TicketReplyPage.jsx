@@ -16,7 +16,7 @@ export default function TicketReplyPage() {
   const [error, setError] = useState(null)
   const [refreshKey, setRefreshKey] = useState(0)  // bump to force ReplyList to re‐fetch
 
-  const API_URL = "http://localhost:3000"
+  const API_URL = "https://e2425-wads-l4ccg1-server.csbihub.id"
 
   useEffect(() => {
     // Fetch the ticket's main data (subject + description)

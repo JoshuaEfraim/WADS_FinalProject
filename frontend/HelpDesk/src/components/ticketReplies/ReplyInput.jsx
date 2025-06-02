@@ -9,7 +9,7 @@ export default function ReplyInput({ ticketId, onReplySent }) {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState(null);
 
-  const API_URL = "http://localhost:3000"
+  const API_URL = "https://e2425-wads-l4ccg1-server.csbihub.id"
 
   const handleSubmit = async (e) => {
     e.preventDefault();

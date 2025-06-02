@@ -38,7 +38,7 @@ const UserTicketDetails = () => {
   const [replyMessage, setReplyMessage] = useState("")
   const [sending, setSending] = useState(false)
 
-  const API_URL = "http://localhost:3000"
+  const API_URL = "https://e2425-wads-l4ccg1-server.csbihub.id"
 
   useEffect(() => {
     fetchTicketDetails()

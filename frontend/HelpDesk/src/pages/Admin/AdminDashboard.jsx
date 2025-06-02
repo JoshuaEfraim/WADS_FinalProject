@@ -26,7 +26,7 @@ const priorityProgressColors = {
   LOW: "bg-green-500",
 }
 
-const API_URL = "http://localhost:3000"
+const API_URL = "https://e2425-wads-l4ccg1-server.csbihub.id"
 
 function getPriorityPercent(prioritySummary, totalTickets, level) {
   const found = prioritySummary.find((p) => p._id === level)

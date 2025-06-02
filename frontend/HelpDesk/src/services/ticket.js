@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const URL = import.meta.env.VITE_API_URL
 
-const API_URL = "http://localhost:3000/api/tickets"; // Match your backend route
+const API_URL = "/api/tickets"; // Match your backend route
 
 const ticketService = {
   /**

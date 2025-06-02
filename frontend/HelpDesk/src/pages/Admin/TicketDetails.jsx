@@ -23,7 +23,7 @@ import {
 } from "lucide-react"
 import TicketReplyPage from "./TicketReplyPage";
 
-const API_URL = "http://localhost:3000"
+const API_URL = "https://e2425-wads-l4ccg1-server.csbihub.id"
 
 const statusOptions = ["AWAITING_APPROVAL", "PENDING", "REJECTED", "PROCESSING", "RESOLVED"]
 const priorityOptions = ["LOW", "MEDIUM", "HIGH"]

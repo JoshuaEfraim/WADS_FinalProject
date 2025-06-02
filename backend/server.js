@@ -11,8 +11,6 @@ import cookieParser from "cookie-parser";
 
 dotenv.config()
 
-
-
 const app = express();
 const port = process.env.PORT;
 
@@ -45,7 +43,7 @@ app.use(express.json());
 
 app.use("/api/admin", adminRoutes)
 app.use("/api/tickets", ticketRoutes)
-app.use("/service/user", usersRoute)
+app.use("/api/user", usersRoute)
 
 app.get("/", (req,res,next) =>{
     res.send("hello world")

@@ -58,7 +58,7 @@ const AllTickets = () => {
   })
   const [searchInput, setSearchInput] = useState(searchParams.get('search') || "")
 
-  const API_URL = "http://localhost:3000"
+  const API_URL = "https://e2425-wads-l4ccg1-server.csbihub.id"
 
   useEffect(() => {
     fetchTickets()
