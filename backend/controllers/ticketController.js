@@ -101,7 +101,7 @@ export const replyToTicket = async (req, res) => {
     // Save the reply (use senderId instead of userId)
     const reply = new TicketReply({
       ticketId: ticket._id,
-      userId: senderId,
+      senderId: senderId,
       message: replyMessage,
     });
     await reply.save();
