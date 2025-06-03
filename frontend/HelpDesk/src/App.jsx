@@ -24,7 +24,6 @@ import UserTicketDetails from './pages/User/UserTicketDetails'
 import UserDashboard from './pages/User/UserDashboard'
 import UserLayout from './components/UserLayout'
 
-import TicketReply from "./pages/Admin/TicketReply";
 
 // Auth callback component
 function AuthCallback() {
