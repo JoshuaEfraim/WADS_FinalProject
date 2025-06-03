@@ -121,7 +121,7 @@ export default function ResetPasswordPage() {
               <div className="flex flex-col gap-6">
                 <div className="flex flex-col items-center text-center">
                   <img
-                    src="/src/assets/logo/siloamLogo-rectangle.png"
+                    src="/logo/siloamLogo-rectangle.png"
                     alt="Siloam Logo"
                     className="h-17 w-65 mb-2"
                   />
